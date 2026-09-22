@@ -465,6 +465,27 @@
     background:linear-gradient(145deg,var(--surface-2),var(--surface));
     border:1px solid var(--border);
   }
+  .player-avatar{ position:relative; overflow:visible; }
+  .battle-gear{
+    position:absolute;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.55));
+    z-index:3;
+  }
+  .battle-vest{
+    right:-5px;
+    bottom:3px;
+    font-size:23px;
+    transform:rotate(7deg);
+  }
+  .battle-weapon{
+    left:-8px;
+    top:7px;
+    font-size:25px;
+    transform:rotate(-18deg);
+  }
   .fighter-name{ font-size:12px; font-weight:800; margin-bottom:3px; }
   .fighter-power{ font-size:10.5px; color:var(--text-dim); }
   .hp-track{
@@ -919,7 +940,7 @@
     var html = '<div class="battle-wrap">';
     html += '<p class="sheet-sub">المواجهة تلقائية: تهاجم أنت أولاً، ثم يرد صاحب المهمة، وتستمر الجولة حتى يفوز أحدكما.</p>';
     html += '<div class="battle-scene"><div class="battle-arena">';
-    html += '<div id="fighterPlayer" class="fighter' + playerActive + '"><div class="avatar">👤</div><div class="fighter-name">أنت</div><div class="fighter-power">القوة القتالية: ' + playerBattlePower() + ' جين</div><div class="hp-track"><div id="playerHP" class="hp-fill" style="width:' + playerPct + '%"></div></div></div>';
+    html += '<div id="fighterPlayer" class="fighter' + playerActive + '"><div class="avatar player-avatar"><span class="avatar-base">👤</span>' + (state.inv.vest ? '<span class="battle-gear battle-vest">🦺</span>' : '') + (state.inv.gear ? '<span class="battle-gear battle-weapon">⚔️</span>' : '') + '</div><div class="fighter-name">أنت</div><div class="fighter-power">القوة القتالية: ' + playerBattlePower() + ' جين</div><div class="hp-track"><div id="playerHP" class="hp-fill" style="width:' + playerPct + '%"></div></div></div>';
     html += '<div class="vs">VS</div>';
     html += '<div id="fighterEnemy" class="fighter' + enemyActive + '"><div class="avatar">🥷</div><div class="fighter-name">' + esc(m.name) + '</div><div class="fighter-power">قوة الخصم: ' + m.enemyPower + ' جين</div><div class="hp-track"><div id="enemyHP" class="hp-fill" style="width:' + enemyPct + '%"></div></div></div>';
     html += '</div><div class="battle-ground"></div><div id="battleImpact" class="impact"></div></div>';
