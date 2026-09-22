@@ -393,18 +393,43 @@
 
   /* ---------- Battle screen ---------- */
   .battle-wrap{ padding-bottom:4px; }
+  .battle-scene{
+    position:relative;
+    min-height:238px;
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    margin:4px 0 12px;
+    background:
+      radial-gradient(circle at 50% 28%, rgba(217,164,65,.10), transparent 34%),
+      linear-gradient(180deg, #171a1f 0%, #111316 58%, #0d0f11 100%);
+  }
+  .battle-scene::before{
+    content:"";
+    position:absolute;
+    left:8%;
+    right:8%;
+    bottom:27px;
+    height:48px;
+    border-radius:50%;
+    background:radial-gradient(ellipse, rgba(0,0,0,.55), transparent 70%);
+  }
   .battle-arena{
+    position:relative;
+    min-height:238px;
     display:grid;
-    grid-template-columns:1fr 52px 1fr;
+    grid-template-columns:1fr 54px 1fr;
     align-items:center;
-    gap:8px;
-    margin:4px 0 14px;
+    gap:6px;
+    padding:18px 8px 28px;
   }
   .fighter{
-    background:var(--surface);
+    position:relative;
+    z-index:2;
+    background:rgba(26,29,34,.88);
     border:1px solid var(--border);
     border-radius:16px;
-    padding:12px 8px;
+    padding:10px 7px;
     text-align:center;
     transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
   }
@@ -413,14 +438,24 @@
     box-shadow:0 0 0 2px rgba(217,164,65,.12);
     transform:translateY(-3px);
   }
-  .fighter.hit{ animation:battleHit .25s ease; }
-  @keyframes battleHit{
+  .fighter.hit-player{ animation:battleAttackPlayer .34s ease; }
+  .fighter.hit-enemy{ animation:battleAttackEnemy .34s ease; }
+  .fighter.damage{ animation:battleDamage .3s ease; }
+  @keyframes battleAttackPlayer{
     0%,100%{ transform:translateX(0); }
-    40%{ transform:translateX(5px); }
+    45%{ transform:translateX(14px) scale(1.035); }
+  }
+  @keyframes battleAttackEnemy{
+    0%,100%{ transform:translateX(0); }
+    45%{ transform:translateX(-14px) scale(1.035); }
+  }
+  @keyframes battleDamage{
+    0%,100%{ filter:none; }
+    35%{ transform:translateX(5px); filter:brightness(1.55); }
   }
   .avatar{
-    width:70px;
-    height:70px;
+    width:76px;
+    height:76px;
     margin:0 auto 8px;
     border-radius:20px;
     display:flex;
@@ -447,7 +482,38 @@
     border-radius:999px;
     transition:width .3s ease;
   }
+  .battle-ground{
+    position:absolute;
+    left:50%;
+    bottom:18px;
+    width:72%;
+    height:2px;
+    transform:translateX(-50%);
+    background:var(--border);
+    box-shadow:0 0 18px rgba(217,164,65,.08);
+  }
+  .impact{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--accent-strong);
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.2);
+    z-index:4;
+    pointer-events:none;
+  }
+  .impact.show{ animation:impactFlash .32s ease; }
+  @keyframes impactFlash{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(.2); }
+    35%{ opacity:1; transform:translate(-50%,-50%) scale(2.8); box-shadow:0 0 24px rgba(240,193,99,.55); }
+    100%{ opacity:0; transform:translate(-50%,-50%) scale(4.5); }
+  }
   .vs{
+    position:relative;
+    z-index:3;
     width:52px;
     height:52px;
     border-radius:50%;
@@ -852,11 +918,11 @@
     var enemyActive = turn === "enemy" ? " active" : "";
     var html = '<div class="battle-wrap">';
     html += '<p class="sheet-sub">المواجهة تلقائية: تهاجم أنت أولاً، ثم يرد صاحب المهمة، وتستمر الجولة حتى يفوز أحدكما.</p>';
-    html += '<div class="battle-arena">';
+    html += '<div class="battle-scene"><div class="battle-arena">';
     html += '<div id="fighterPlayer" class="fighter' + playerActive + '"><div class="avatar">👤</div><div class="fighter-name">أنت</div><div class="fighter-power">القوة القتالية: ' + playerBattlePower() + ' جين</div><div class="hp-track"><div id="playerHP" class="hp-fill" style="width:' + playerPct + '%"></div></div></div>';
     html += '<div class="vs">VS</div>';
     html += '<div id="fighterEnemy" class="fighter' + enemyActive + '"><div class="avatar">🥷</div><div class="fighter-name">' + esc(m.name) + '</div><div class="fighter-power">قوة الخصم: ' + m.enemyPower + ' جين</div><div class="hp-track"><div id="enemyHP" class="hp-fill" style="width:' + enemyPct + '%"></div></div></div>';
-    html += '</div>';
+    html += '</div><div class="battle-ground"></div><div id="battleImpact" class="impact"></div></div>';
     html += '<div id="battleStatus" class="battle-status">' + esc(status) + '</div>';
     html += '<div id="battleLog" class="battle-log">';
     log.forEach(function(line){ html += '<p>' + esc(line) + '</p>'; });
@@ -864,7 +930,7 @@
     return html + '</div>';
   }
 
-  function updateBattleUI(playerHP, enemyHP, turn, line, status){
+  function updateBattleUI(playerHP, enemyHP, turn, line, status, attacker){
     var p = $("playerHP");
     var e = $("enemyHP");
     var log = $("battleLog");
@@ -874,6 +940,29 @@
     var ef = $("fighterEnemy");
     if(pf) pf.classList.toggle("active", turn === "player");
     if(ef) ef.classList.toggle("active", turn === "enemy");
+
+    [pf, ef].forEach(function(el){
+      if(el) el.classList.remove("hit-player","hit-enemy","damage");
+    });
+    var attackerEl = attacker === "player" ? pf : ef;
+    var targetEl = attacker === "player" ? ef : pf;
+    if(attackerEl){
+      void attackerEl.offsetWidth;
+      attackerEl.classList.add(attacker === "player" ? "hit-player" : "hit-enemy");
+    }
+    if(targetEl){
+      setTimeout(function(){
+        targetEl.classList.remove("damage");
+        void targetEl.offsetWidth;
+        targetEl.classList.add("damage");
+      }, 180);
+    }
+    var impact = $("battleImpact");
+    if(impact){
+      impact.classList.remove("show");
+      void impact.offsetWidth;
+      impact.classList.add("show");
+    }
     if(line && log){
       var item = document.createElement("p");
       item.textContent = line;
@@ -930,7 +1019,7 @@
         var accuracyBonus = state.stats.accuracy * 0.12;
         var damage = Math.max(5, Math.round(playerPower * (0.72 + Math.random() * 0.38) + accuracyBonus));
         enemyHP = Math.max(0, enemyHP - damage);
-        updateBattleUI(playerHP, enemyHP, "enemy", "أنت هاجمت وألحقت " + damage + " ضرر.", "هجومك تم — دور الخصم");
+        updateBattleUI(playerHP, enemyHP, "enemy", "أنت هاجمت وألحقت " + damage + " ضرر.", "هجومك تم — دور الخصم", "player");
         if(enemyHP <= 0){
           finishMissionBattle(m, true, playerHP, enemyHP);
           return;
@@ -939,7 +1028,7 @@
       }else{
         var enemyDamage = Math.max(3, Math.round(enemyPower * (0.50 + Math.random() * 0.28) - state.stats.defense * 0.16));
         playerHP = Math.max(0, playerHP - enemyDamage);
-        updateBattleUI(playerHP, enemyHP, "player", "صاحب المهمة هاجم وألحق " + enemyDamage + " ضرر.", "دورك الآن");
+        updateBattleUI(playerHP, enemyHP, "player", "صاحب المهمة هاجم وألحق " + enemyDamage + " ضرر.", "دورك الآن", "enemy");
         if(playerHP <= 0){
           finishMissionBattle(m, false, playerHP, enemyHP);
           return;
