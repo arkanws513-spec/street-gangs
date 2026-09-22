@@ -391,6 +391,100 @@
   }
   .notice-warn{ background:rgba(193,68,60,.12); color:#e8827b; border:1px solid rgba(193,68,60,.3); }
 
+  /* ---------- Battle screen ---------- */
+  .battle-wrap{ padding-bottom:4px; }
+  .battle-arena{
+    display:grid;
+    grid-template-columns:1fr 52px 1fr;
+    align-items:center;
+    gap:8px;
+    margin:4px 0 14px;
+  }
+  .fighter{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px 8px;
+    text-align:center;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  .fighter.active{
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px rgba(217,164,65,.12);
+    transform:translateY(-3px);
+  }
+  .fighter.hit{ animation:battleHit .25s ease; }
+  @keyframes battleHit{
+    0%,100%{ transform:translateX(0); }
+    40%{ transform:translateX(5px); }
+  }
+  .avatar{
+    width:70px;
+    height:70px;
+    margin:0 auto 8px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
+    background:linear-gradient(145deg,var(--surface-2),var(--surface));
+    border:1px solid var(--border);
+  }
+  .fighter-name{ font-size:12px; font-weight:800; margin-bottom:3px; }
+  .fighter-power{ font-size:10.5px; color:var(--text-dim); }
+  .hp-track{
+    height:7px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:999px;
+    overflow:hidden;
+    margin-top:8px;
+  }
+  .hp-fill{
+    height:100%;
+    width:100%;
+    background:var(--good);
+    border-radius:999px;
+    transition:width .3s ease;
+  }
+  .vs{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:900;
+    color:var(--accent-strong);
+  }
+  .battle-status{
+    text-align:center;
+    font-size:12px;
+    color:var(--text-dim);
+    min-height:22px;
+    margin-bottom:9px;
+  }
+  .battle-log{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:10px 12px;
+    max-height:120px;
+    overflow:auto;
+    margin-bottom:10px;
+  }
+  .battle-log p{
+    margin:0;
+    padding:5px 0;
+    border-bottom:1px dashed var(--border);
+    font-size:11.5px;
+    line-height:1.45;
+  }
+  .battle-log p:last-child{ border-bottom:none; }
+
   /* ---------- Toast ---------- */
   .toast{
     position:fixed;
@@ -494,10 +588,10 @@
       { id:"materials", icon:"🧱", name:"مواد بناء", base:100 }
     ],
     missions: [
-      { id:"delivery", icon:"📦",  name:"توصيل شحنة",       diff:"سهلة",   energy:15, cash:80,  xp:20 },
-      { id:"race",     icon:"🏁",  name:"سباق الشوارع",      diff:"متوسطة", energy:20, cash:140, xp:35 },
-      { id:"turf",     icon:"🏙️", name:"توسيع النفوذ",      diff:"صعبة",   energy:28, cash:250, xp:55 },
-      { id:"deal",     icon:"🤝",  name:"اتفاق مع حي جديد",  diff:"خبيرة",  energy:35, cash:400, xp:80 }
+      { id:"delivery", icon:"📦",  name:"توصيل شحنة",      diff:"سهلة",   level:1, enemyPower:5,   energy:15, cash:80,  xp:20 },
+      { id:"race",     icon:"🏁",  name:"سباق الشوارع",     diff:"متوسطة", level:2, enemyPower:30,  energy:20, cash:140, xp:35 },
+      { id:"turf",     icon:"🏙️", name:"توسيع النفوذ",     diff:"صعبة",   level:3, enemyPower:90,  energy:28, cash:250, xp:55 },
+      { id:"deal",     icon:"🤝",  name:"اتفاق مع حي جديد", diff:"خبيرة",  level:4, enemyPower:220, energy:35, cash:400, xp:80 }
     ],
     market: [
       { id:"vest",  icon:"🦺", name:"سترة حماية",   desc:"دفاع +2",  price:180, stat:"defense",  amount:2 },
@@ -657,13 +751,14 @@
 
   function missionHTML(){
     var xpNext = xpNeeded(state.level);
-    var html = '<p class="sheet-sub">اختر مهمة. كل مهمة تستهلك طاقة وتعطيك مالاً وخبرة واحتراماً.</p>';
+    var html = '<p class="sheet-sub">اختر مهمة. قبل المكافأة ستدخل مواجهة متدرجة مع صاحب المهمة.</p>';
     html += '<div class="progress-line"><span>خبرة المستوى</span><b>' + state.xp + ' / ' + xpNext + '</b></div>';
     CONFIG.missions.forEach(function(m){
+      var locked = state.level < m.level;
       html += '<div class="row-card">';
       html += '<div class="row-icon">' + m.icon + '</div>';
-      html += '<div class="row-info"><b>' + esc(m.name) + '</b><small>' + m.diff + ' • ⚡ ' + m.energy + ' • 💵 ' + m.cash + ' • XP ' + m.xp + '</small></div>';
-      html += '<button class="btn btn-small" data-do="mission" data-id="' + m.id + '">ابدأ</button>';
+      html += '<div class="row-info"><b>' + esc(m.name) + '</b><small>مستوى ' + m.level + ' • قوة الخصم ' + m.enemyPower + ' جين • ⚡ ' + m.energy + ' • 💵 ' + m.cash + ' • XP ' + m.xp + '</small></div>';
+      html += '<button class="btn btn-small ' + (locked ? 'btn-ghost' : '') + '" data-do="mission" data-id="' + m.id + '"' + (locked ? ' disabled' : '') + '>' + (locked ? 'مغلق' : 'ابدأ') + '</button>';
       html += '</div>';
     });
     return html;
@@ -737,20 +832,133 @@
     else if(action === "open-profile") openSheet("ملفي", profileHTML());
   }
 
+  function playerBattlePower(){
+    return Math.max(1, Math.round(
+      state.stats.power +
+      state.stats.defense * 0.35 +
+      state.stats.speed * 0.35 +
+      state.stats.accuracy * 0.45
+    ));
+  }
+
+  var battleTimer = null;
+
+  function battleHTML(m, playerHP, enemyHP, log, turn, status){
+    var playerMax = 100;
+    var enemyMax = 100;
+    var playerPct = Math.max(0, Math.min(100, playerHP));
+    var enemyPct = Math.max(0, Math.min(100, enemyHP));
+    var playerActive = turn === "player" ? " active" : "";
+    var enemyActive = turn === "enemy" ? " active" : "";
+    var html = '<div class="battle-wrap">';
+    html += '<p class="sheet-sub">المواجهة تلقائية: تهاجم أنت أولاً، ثم يرد صاحب المهمة، وتستمر الجولة حتى يفوز أحدكما.</p>';
+    html += '<div class="battle-arena">';
+    html += '<div id="fighterPlayer" class="fighter' + playerActive + '"><div class="avatar">👤</div><div class="fighter-name">أنت</div><div class="fighter-power">القوة القتالية: ' + playerBattlePower() + ' جين</div><div class="hp-track"><div id="playerHP" class="hp-fill" style="width:' + playerPct + '%"></div></div></div>';
+    html += '<div class="vs">VS</div>';
+    html += '<div id="fighterEnemy" class="fighter' + enemyActive + '"><div class="avatar">🥷</div><div class="fighter-name">' + esc(m.name) + '</div><div class="fighter-power">قوة الخصم: ' + m.enemyPower + ' جين</div><div class="hp-track"><div id="enemyHP" class="hp-fill" style="width:' + enemyPct + '%"></div></div></div>';
+    html += '</div>';
+    html += '<div id="battleStatus" class="battle-status">' + esc(status) + '</div>';
+    html += '<div id="battleLog" class="battle-log">';
+    log.forEach(function(line){ html += '<p>' + esc(line) + '</p>'; });
+    html += '</div>';
+    return html + '</div>';
+  }
+
+  function updateBattleUI(playerHP, enemyHP, turn, line, status){
+    var p = $("playerHP");
+    var e = $("enemyHP");
+    var log = $("battleLog");
+    if(p) p.style.width = Math.max(0, playerHP) + "%";
+    if(e) e.style.width = Math.max(0, enemyHP) + "%";
+    var pf = $("fighterPlayer");
+    var ef = $("fighterEnemy");
+    if(pf) pf.classList.toggle("active", turn === "player");
+    if(ef) ef.classList.toggle("active", turn === "enemy");
+    if(line && log){
+      var item = document.createElement("p");
+      item.textContent = line;
+      log.appendChild(item);
+      log.scrollTop = log.scrollHeight;
+    }
+    if($("battleStatus")) $("battleStatus").textContent = status;
+  }
+
+  function finishMissionBattle(m, won, playerHP, enemyHP){
+    clearInterval(battleTimer);
+    battleTimer = null;
+    if(won){
+      state.cash += m.cash;
+      state.done += 1;
+      var respectGain = Math.max(1, Math.ceil(m.xp / 20));
+      state.respect += respectGain;
+      var levelUp = addXP(m.xp);
+      commit();
+      openSheet("نتيجة المعركة", '<div class="result-card"><div class="result-icon">✓</div><div><b>فزت بالمواجهة</b><small>هزمت صاحب المهمة وكملت المهمة.</small></div></div>' +
+        '<ul class="reward-list"><li>💵 +' + m.cash + '</li><li>⭐ احترام +' + respectGain + '</li><li>✨ XP +' + m.xp + '</li>' +
+        (levelUp ? '<li class="level-up">🎉 ارتقيت إلى المستوى ' + state.level + '</li>' : '') + '</ul>' +
+        '<button class="btn btn-block" data-do="back-missions">العودة إلى المهمات</button>');
+      toast(levelUp ? "فوز! وترقيت في المستوى" : "فوز! حصلت على المكافآت", "good");
+    }else{
+      var loss = Math.min(state.energy, 10);
+      state.energy -= loss;
+      commit();
+      openSheet("نتيجة المعركة", '<div class="result-card"><div class="result-icon" style="background:rgba(193,68,60,.15);color:#e8827b">×</div><div><b>خسرت المواجهة</b><small>لم تكتمل المهمة هذه المرة.</small></div></div>' +
+        '<ul class="reward-list"><li>⚡ -' + loss + ' طاقة</li><li>💵 لا توجد مكافأة</li><li>✨ لا توجد خبرة</li></ul>' +
+        '<button class="btn btn-block" data-do="back-missions">العودة إلى المهمات</button>');
+      toast("خسرت المواجهة وفقدت " + loss + " طاقة", "warn");
+    }
+  }
+
+  function startMissionBattle(m){
+    clearInterval(battleTimer);
+    var playerPower = playerBattlePower();
+    var enemyPower = m.enemyPower;
+    var playerHP = 100;
+    var enemyHP = 100;
+    var turn = "player";
+    var log = ["بدأت المواجهة. أنت تهاجم أولاً."];
+    openSheet("المواجهة", battleHTML(m, playerHP, enemyHP, log, turn, "دورك الآن"));
+
+    battleTimer = setInterval(function(){
+      if(!sheetOpen){
+        clearInterval(battleTimer);
+        battleTimer = null;
+        return;
+      }
+
+      if(turn === "player"){
+        var accuracyBonus = state.stats.accuracy * 0.12;
+        var damage = Math.max(5, Math.round(playerPower * (0.72 + Math.random() * 0.38) + accuracyBonus));
+        enemyHP = Math.max(0, enemyHP - damage);
+        updateBattleUI(playerHP, enemyHP, "enemy", "أنت هاجمت وألحقت " + damage + " ضرر.", "هجومك تم — دور الخصم");
+        if(enemyHP <= 0){
+          finishMissionBattle(m, true, playerHP, enemyHP);
+          return;
+        }
+        turn = "enemy";
+      }else{
+        var enemyDamage = Math.max(3, Math.round(enemyPower * (0.50 + Math.random() * 0.28) - state.stats.defense * 0.16));
+        playerHP = Math.max(0, playerHP - enemyDamage);
+        updateBattleUI(playerHP, enemyHP, "player", "صاحب المهمة هاجم وألحق " + enemyDamage + " ضرر.", "دورك الآن");
+        if(playerHP <= 0){
+          finishMissionBattle(m, false, playerHP, enemyHP);
+          return;
+        }
+        turn = "player";
+      }
+    }, 850);
+  }
+
   function runMission(id){
     var m = CONFIG.missions.find(function(x){ return x.id === id; });
     if(!m) return;
+    if(state.level < m.level){
+      toast("هذه المهمة تفتح عند المستوى " + m.level, "warn");
+      return;
+    }
     if(!spendEnergy(m.energy)) return;
-    state.cash += m.cash;
-    state.done += 1;
-    state.respect += Math.max(1, Math.ceil(m.xp / 20));
-    var levelUp = addXP(m.xp);
-    commit();
-    openSheet("المهمات", '<div class="result-card"><div class="result-icon">✓</div><div><b>تمت المهمة بنجاح</b><small>' + m.name + '</small></div></div>' +
-      '<ul class="reward-list"><li>💵 +' + m.cash + '</li><li>⭐ احترام +' + Math.max(1, Math.ceil(m.xp / 20)) + '</li><li>✨ XP +' + m.xp + '</li>' +
-      (levelUp ? '<li class="level-up">🎉 ارتقيت إلى المستوى ' + state.level + '</li>' : '') + '</ul>' +
-      '<button class="btn btn-block" data-do="back-missions">مهمة أخرى</button>');
-    toast(levelUp ? "مبروك! ارتقيت في المستوى" : "تم تنفيذ المهمة", "good");
+    persist();
+    startMissionBattle(m);
   }
 
   function trainSkill(key){
