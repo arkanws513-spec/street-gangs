@@ -1,4 +1,4 @@
-(()=>{let renderer,scene,camera,raycaster,mouse;const targets=[];const focus=new THREE.Vector3(0,0,0);let dragging=false,moved=false,lastX=0,lastY=0,zoom=30;
+(()=>{let renderer,scene,camera,raycaster,mouse;const targets=[];const focus=new THREE.Vector3(0,0,0);let dragging=false,moved=false,lastX=0,lastY=0,zoom=30,velX=0,velZ=0,lastT=0;
 const mat=(c,r=.75,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 const mesh=(geo,p,c,r=.75,m=0)=>{const o=new THREE.Mesh(geo,mat(c,r,m));o.position.set(...p);o.castShadow=o.receiveShadow=true;return o};
 function box(s,p,c,r=.75,m=0){return mesh(new THREE.BoxGeometry(...s),p,c,r,m)}
@@ -37,9 +37,17 @@ events(c);resize();applyCamera();animate()}
 function resize(){const c=document.getElementById("city3d");const a=c.clientWidth/c.clientHeight;const v=18;camera.left=-v;camera.right=v;camera.top=v/a;camera.bottom=-v/a;camera.updateProjectionMatrix();renderer.setSize(c.clientWidth,c.clientHeight,false)}
 function applyCamera(){const a=new THREE.Vector3(28,28,28).normalize().multiplyScalar(zoom);camera.position.copy(focus).add(a);camera.lookAt(focus)}
 function clamp(){focus.x=Math.max(-32,Math.min(32,focus.x));focus.z=Math.max(-30,Math.min(30,focus.z))}
-function events(c){c.addEventListener("pointerdown",e=>{dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;c.setPointerCapture(e.pointerId)});
-c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;if(dragging){const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;focus.x-=dx*.045;focus.z+=dy*.045;clamp();applyCamera()}lastX=e.clientX;lastY=e.clientY;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.name))g=g.parent;const h=document.getElementById("buildingHint");if(g&&g.userData.action!=="none"){h.textContent=g.userData.name+"  •  اضغط للدخول";h.classList.add("show")}else h.classList.remove("show")});
+function events(c){
+c.style.touchAction="none";
+c.addEventListener("pointerdown",e=>{dragging=true;moved=false;velX=velZ=0;lastX=e.clientX;lastY=e.clientY;lastT=performance.now();c.setPointerCapture(e.pointerId)});
+c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;
+if(dragging){const now=performance.now(),dt=Math.max(8,now-lastT),dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+const k=.055;focus.x-=dx*k;focus.z+=dy*k;velX=-dx*k*(16.67/dt);velZ=dy*k*(16.67/dt);clamp();applyCamera();lastT=now}lastX=e.clientX;lastY=e.clientY;
+raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.name))g=g.parent;const h=document.getElementById("buildingHint");if(g&&g.userData.action!=="none"){h.textContent=g.userData.name+"  •  اضغط للدخول";h.classList.add("show")}else h.classList.remove("show")});
 c.addEventListener("pointerup",e=>{dragging=false;if(moved)return;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.action))g=g.parent;if(g&&g.userData.action!=="none"&&typeof act==="function")act(g.userData.action)});
-c.addEventListener("wheel",e=>{zoom=Math.max(23,Math.min(43,zoom+e.deltaY*.018));applyCamera();e.preventDefault()},{passive:false});c.addEventListener("contextmenu",e=>e.preventDefault());window.addEventListener("resize",resize)}
-function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}
+c.addEventListener("pointercancel",()=>dragging=false);
+c.addEventListener("wheel",e=>{zoom=Math.max(23,Math.min(43,zoom+e.deltaY*.018));applyCamera();e.preventDefault()},{passive:false});
+c.addEventListener("contextmenu",e=>e.preventDefault());window.addEventListener("resize",resize)}
+
+function animate(){requestAnimationFrame(animate);if(!dragging&&(Math.abs(velX)+Math.abs(velZ)>.002)){focus.x+=velX;focus.z+=velZ;velX*=.88;velZ*=.88;clamp();applyCamera()}renderer.render(scene,camera)}
 window.addEventListener("load",init)})();
