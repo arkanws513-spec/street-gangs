@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>عالم المافيا</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div><div class="brand">عالم المافيا</div><div class="sub">مدينة واحدة… ونفوذ بلا حدود</div></div><button id="reset">إعادة اللعبة</button></header>
+<main>
+<section class="stats">
+<div><b id="cash">0</b><span>💰 المال</span></div><div><b id="respect">0</b><span>⭐ السمعة</span></div><div><b id="power">0</b><span>🔥 النفوذ</span></div><div><b id="energy">100</b><span>⚡ الطاقة</span></div>
+</section>
+<section class="city">
+<h2>المدينة</h2>
+<div class="districts">
+<button data-action="work">🏪 الحي التجاري<small>أعمال يومية</small></button>
+<button data-action="property">🏢 العقارات<small>شراء وتطوير</small></button>
+<button data-action="crew">👥 العصابة<small>تجنيد وتطوير</small></button>
+<button data-action="missions">📋 العمليات<small>مهام المدينة</small></button>
+<button data-action="market">📈 السوق<small>استثمارات</small></button>
+<button data-action="club">🍸 النادي<small>رفع السمعة</small></button>
+</div>
+</section>
+<section class="panel">
+<h2>نشاط المدينة</h2><div id="log" class="log"></div>
+</section>
+<section class="panel">
+<h2>مقر العصابة</h2>
+<div class="crewbar"><span>مستوى المقر <b id="hq">1</b></span><span>أفراد <b id="members">1</b></span></div>
+<button id="upgrade">ترقية المقر — <b id="upgradeCost">500</b> 💰</button>
+</section>
+</main>
+<script src="game.js"></script>
+</body></html>
