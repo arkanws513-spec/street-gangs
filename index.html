@@ -1,1 +1,52 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>عصابات الشوارع</title><link rel="stylesheet" href="style.css"></head><body><div class="app"><header><div class="brand"><b>♠ عصابات الشوارع</b><small>زعيم المدينة • مستوى <span id="level">1</span></small></div><div class="res">💵 <b id="cash">1000</b>　⚡ <b id="energy">100</b>　⭐ <b id="respect">10</b></div></header><section class="xp"><b>المستوى <span id="level2">1</span></b><span id="xpText">0 / 100 XP</span><div><i id="xpFill"></i></div><small>نقاط التدريب: <b id="stamina">0</b></small></section><main><div class="title"><div><small>الخريطة الرئيسية</small><h1>وسط المدينة</h1></div><b>اسحب ↑ ↓</b></div><canvas id="city3d"></canvas><div id="buildingHint"></div></main><section class="events"><b>آخر الأحداث</b><div id="log"></div></section><nav><button data-a="home">⌂<small>المدينة</small></button><button data-a="missions">⚔<small>المهمات</small></button><button data-a="training">✦<small>التدريب</small></button><button data-a="market">▣<small>التسوق</small></button><button data-a="trade">◆<small>التجارة</small></button></nav></div><div id="screen"><div class="panel"><button id="close">×</button><div id="content"></div></div></div><script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script><script src="scene.js"></script><script src="game.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>عصابات الشوارع</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><strong>♠ عصابات الشوارع</strong><span>زعيم المدينة</span></div>
+  <div class="money">💵 <b id="cash">1000</b></div>
+</header>
+
+<section class="hero">
+  <div>
+    <span>المستوى 1</span>
+    <h1>وسط المدينة</h1>
+    <p>إدارة عصابتك وبناء نفوذك في المدينة</p>
+  </div>
+  <div class="avatar">👤</div>
+</section>
+
+<section class="stats">
+  <div><b>⭐ 10</b><small>احترام</small></div>
+  <div><b>⚡ 100</b><small>طاقة</small></div>
+  <div><b>🏆 0</b><small>مهمات</small></div>
+</section>
+
+<main>
+  <h2>المدينة</h2>
+  <div class="menu">
+    <button data-a="missions"><span>⚔️</span><b>المهمات</b><small>نفّذ المهام واكسب المال والخبرة</small><i>›</i></button>
+    <button data-a="training"><span>🏋️</span><b>التدريب</b><small>طوّر مهارات شخصيتك</small><i>›</i></button>
+    <button data-a="market"><span>🛒</span><b>التسوق</b><small>اشترِ معدات جديدة</small><i>›</i></button>
+    <button data-a="trade"><span>📦</span><b>التجارة</b><small>اشترِ وبِع لتحقيق الأرباح</small><i>›</i></button>
+    <button data-a="base"><span>🏢</span><b>المقر</b><small>تابع مستوى عصابتك</small><i>›</i></button>
+    <button data-a="profile"><span>👤</span><b>ملفي</b><small>الإحصاءات والقدرات</small><i>›</i></button>
+  </div>
+</main>
+
+<div id="screen">
+  <div class="panel">
+    <button id="close">×</button>
+    <div id="content"></div>
+  </div>
+</div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
