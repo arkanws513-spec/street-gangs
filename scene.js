@@ -39,15 +39,53 @@ function applyCamera(){const a=new THREE.Vector3(28,28,28).normalize().multiplyS
 function clamp(){focus.x=Math.max(-32,Math.min(32,focus.x));focus.z=Math.max(-30,Math.min(30,focus.z))}
 function events(c){
 c.style.touchAction="none";
-c.addEventListener("pointerdown",e=>{dragging=true;moved=false;velX=velZ=0;lastX=e.clientX;lastY=e.clientY;lastT=performance.now();c.setPointerCapture(e.pointerId)});
-c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;
-if(dragging){const now=performance.now(),dt=Math.max(8,now-lastT),dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
-const k=.055;focus.x-=dx*k;focus.z+=dy*k;velX=-dx*k*(16.67/dt);velZ=dy*k*(16.67/dt);clamp();applyCamera();lastT=now}lastX=e.clientX;lastY=e.clientY;
-raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.name))g=g.parent;const h=document.getElementById("buildingHint");if(g&&g.userData.action!=="none"){h.textContent=g.userData.name+"  •  اضغط للدخول";h.classList.add("show")}else h.classList.remove("show")});
-c.addEventListener("pointerup",e=>{dragging=false;if(moved)return;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.action))g=g.parent;if(g&&g.userData.action!=="none"&&typeof act==="function")act(g.userData.action)});
-c.addEventListener("pointercancel",()=>dragging=false);
-c.addEventListener("wheel",e=>{zoom=Math.max(23,Math.min(43,zoom+e.deltaY*.018));applyCamera();e.preventDefault()},{passive:false});
-c.addEventListener("contextmenu",e=>e.preventDefault());window.addEventListener("resize",resize)}
+c.addEventListener("pointerdown",e=>{
+ dragging=true;moved=false;velX=velZ=0;
+ lastX=e.clientX;lastY=e.clientY;lastT=performance.now();
+ c.setPointerCapture(e.pointerId);
+});
+c.addEventListener("pointermove",e=>{
+ const r=c.getBoundingClientRect();
+ mouse.x=(e.clientX-r.left)/r.width*2-1;
+ mouse.y=-(e.clientY-r.top)/r.height*2+1;
+ if(dragging){
+  const now=performance.now(),dt=Math.max(8,now-lastT);
+  const dx=e.clientX-lastX,dy=e.clientY-lastY;
+  if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+  const k=.055;
+  // الشاشة تتحرك في نفس اتجاه إصبع المستخدم.
+  focus.x-=dx*k;
+  focus.z+=dy*k;
+  velX=-dx*k*(16.67/dt);
+  velZ=dy*k*(16.67/dt);
+  clamp();applyCamera();lastT=now;
+ }
+ lastX=e.clientX;lastY=e.clientY;
+ raycaster.setFromCamera(mouse,camera);
+ const hits=raycaster.intersectObjects(targets,true);
+ let g=hits.length?hits[0].object:null;
+ while(g&&(!g.userData||!g.userData.name))g=g.parent;
+ const h=document.getElementById("buildingHint");
+ if(g&&g.userData.action!=="none"){h.textContent=g.userData.name+"  •  اضغط للدخول";h.classList.add("show")}
+ else h.classList.remove("show");
+});
+c.addEventListener("pointerup",e=>{
+ dragging=false;
+ if(moved)return;
+ raycaster.setFromCamera(mouse,camera);
+ const hits=raycaster.intersectObjects(targets,true);
+ let g=hits.length?hits[0].object:null;
+ while(g&&(!g.userData||!g.userData.action))g=g.parent;
+ if(g&&g.userData.action!=="none"&&typeof act==="function")act(g.userData.action);
+});
+c.addEventListener("pointercancel",()=>{dragging=false;velX=velZ=0});
+c.addEventListener("wheel",e=>{
+ zoom=Math.max(23,Math.min(43,zoom+e.deltaY*.018));
+ applyCamera();e.preventDefault();
+},{passive:false});
+c.addEventListener("contextmenu",e=>e.preventDefault());
+window.addEventListener("resize",resize);
+}
 
 function animate(){requestAnimationFrame(animate);if(!dragging&&(Math.abs(velX)+Math.abs(velZ)>.002)){focus.x+=velX;focus.z+=velZ;velX*=.88;velZ*=.88;clamp();applyCamera()}renderer.render(scene,camera)}
 window.addEventListener("load",init)})();
