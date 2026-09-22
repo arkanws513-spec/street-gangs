@@ -2,51 +2,628 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>عصابات الشوارع</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#111316;
+    --bg-body:#0c0d0f;
+    --surface:#1a1d22;
+    --surface-2:#20242a;
+    --border:#2c3137;
+    --text:#ece8e1;
+    --text-dim:#9aa0a8;
+    --text-faint:#666c73;
+    --accent:#d9a441;
+    --accent-strong:#f0c163;
+    --danger:#c1443c;
+    --good:#4fa8a0;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --font: 'Tajawal', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+  }
+  *{ box-sizing:border-box; }
+  html{
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family:var(--font);
+    background:var(--bg-body);
+    color:var(--text);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-tap-highlight-color: transparent;
+  }
+  button{ font-family:inherit; }
+
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100%;
+    background:var(--bg);
+    position:relative;
+    overflow-x:hidden;
+  }
+  @media (min-width:540px){
+    body{ background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(217,164,65,.06), transparent 60%),
+      var(--bg-body);
+    }
+    .app{
+      margin-top:28px;
+      margin-bottom:28px;
+      border-radius:28px;
+      border:1px solid var(--border);
+      box-shadow:0 30px 80px rgba(0,0,0,.55);
+      min-height:auto;
+    }
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 18px 10px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{
+    width:38px; height:38px;
+    border:1.5px solid var(--accent);
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--accent);
+    font-size:19px;
+    font-weight:800;
+    flex-shrink:0;
+  }
+  .brand-text{ display:flex; flex-direction:column; line-height:1.25; }
+  .brand-text strong{ font-size:15px; font-weight:800; letter-spacing:.2px; }
+  .brand-text span{ font-size:11.5px; color:var(--text-dim); }
+  .cash-pill{
+    display:flex; align-items:center; gap:6px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:7px 12px;
+    border-radius:999px;
+  }
+  .cash-pill .cash-icon{ font-size:14px; }
+  .cash-pill b{ font-size:14.5px; font-weight:800; color:var(--accent-strong); }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    display:flex; align-items:center; gap:16px;
+    padding:22px 18px 18px;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 18% 30%, rgba(217,164,65,.16), transparent 55%);
+    pointer-events:none;
+  }
+  .hero-badge{
+    position:relative;
+    width:64px; height:64px;
+    border-radius:16px;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .hero-badge::after{
+    content:"مستوى";
+    position:absolute;
+    bottom:-9px;
+    font-size:9px;
+    color:var(--text-dim);
+    background:var(--bg);
+    padding:0 6px;
+  }
+  .hero-badge b{ font-size:26px; font-weight:900; color:var(--accent-strong); }
+  .hero-content{ position:relative; }
+  .hero-content h1{
+    margin:0 0 4px;
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:.2px;
+  }
+  .hero-content p{
+    margin:0;
+    font-size:12.5px;
+    color:var(--text-dim);
+    line-height:1.6;
+    max-width:30ch;
+  }
+
+  /* ---------- Meters ---------- */
+  .meters{ padding:2px 18px 14px; display:flex; flex-direction:column; gap:10px; }
+  .meter-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:12px; color:var(--text-dim); margin-bottom:6px;
+  }
+  .meter-head span:first-child{ color:var(--text); font-weight:700; }
+  .meter-track{
+    height:8px; border-radius:999px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    overflow:hidden;
+  }
+  .meter-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--accent), var(--accent-strong));
+    border-radius:999px;
+    transition:width .4s ease;
+  }
+  .meter-note{
+    display:block; margin-top:5px;
+    font-size:10.5px; color:var(--text-faint);
+  }
+  .pill-row{ display:flex; gap:10px; }
+  .pill-stat{
+    flex:1;
+    display:flex; align-items:center; gap:8px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:10px 12px;
+  }
+  .pill-stat span{ font-size:16px; }
+  .pill-stat b{ font-size:15px; font-weight:800; }
+  .pill-stat small{ display:block; font-size:10.5px; color:var(--text-dim); }
+
+  /* ---------- Menu grid ---------- */
+  main{ padding:6px 18px 26px; }
+  main h2{
+    font-size:13px; font-weight:700; color:var(--text-dim);
+    margin:14px 2px 10px;
+  }
+  .menu{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .tile{
+    display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:14px;
+    text-align:right;
+    cursor:pointer;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .tile:active{ transform:scale(.97); }
+  .tile:hover{ border-color:#3a4048; }
+  .tile .tile-icon{ font-size:22px; }
+  .tile b{ font-size:13.5px; font-weight:800; }
+  .tile small{ font-size:10.5px; color:var(--text-dim); line-height:1.5; }
+
+  /* ---------- Bottom sheet ---------- */
+  .sheet-overlay{
+    position:fixed; inset:0;
+    background:rgba(6,7,8,.6);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+    z-index:50;
+  }
+  .sheet-overlay.open{ opacity:1; pointer-events:auto; }
+  .sheet{
+    width:100%; max-width:480px;
+    max-height:82vh;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-bottom:none;
+    border-radius:22px 22px 0 0;
+    display:flex; flex-direction:column;
+    transform:translateY(100%);
+    transition:transform .3s cubic-bezier(.22,.9,.32,1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .sheet-overlay.open .sheet{ transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){
+    .sheet, .sheet-overlay{ transition:none; }
+  }
+  .sheet-handle{
+    width:36px; height:4px; border-radius:999px;
+    background:var(--border);
+    margin:10px auto 0;
+  }
+  .sheet-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px 8px;
+    flex-shrink:0;
+  }
+  .sheet-header h2{ margin:0; font-size:17px; font-weight:800; }
+  .sheet-header button{
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-dim);
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .sheet-content{
+    overflow-y:auto;
+    padding:4px 18px 22px;
+  }
+  .sheet-sub{
+    font-size:12px; color:var(--text-dim); line-height:1.6;
+    margin:0 0 14px;
+  }
+
+  /* ---------- Reusable rows ---------- */
+  .row-card{
+    display:flex; align-items:center; gap:12px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:11px 12px;
+    margin-bottom:9px;
+  }
+  .row-icon{
+    width:38px; height:38px; flex-shrink:0;
+    border-radius:10px;
+    background:var(--surface-2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .row-info{ flex:1; min-width:0; }
+  .row-info b{ display:block; font-size:13px; font-weight:800; }
+  .row-info small{ display:block; font-size:10.5px; color:var(--text-dim); margin-top:2px; }
+  .row-actions{ display:flex; gap:6px; }
+
+  .btn{
+    border:none; cursor:pointer;
+    background:var(--accent);
+    color:#1a1204;
+    font-weight:800; font-size:12.5px;
+    padding:9px 14px;
+    border-radius:var(--radius-sm);
+    white-space:nowrap;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .btn:active{ transform:scale(.96); }
+  .btn:hover{ filter:brightness(1.08); }
+  .btn-small{ padding:7px 11px; font-size:11.5px; }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+  }
+  .btn-block{ display:block; width:100%; text-align:center; margin-top:6px; }
+  .btn-danger{ background:var(--danger); color:#fff; }
+
+  .progress-line{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:10px 13px;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-bottom:12px;
+  }
+  .progress-line b{ color:var(--text); font-size:14px; }
+
+  .chip-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .chip{
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-dim);
+    font-size:11.5px; font-weight:700;
+    padding:8px 13px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .chip-active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#1a1204;
+  }
+
+  .skill-row{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:11px 13px;
+    margin-bottom:9px;
+  }
+  .skill-row b{ display:block; font-size:13px; font-weight:800; }
+  .skill-row small{ font-size:10.5px; color:var(--text-dim); }
+
+  .result-card{
+    display:flex; align-items:center; gap:12px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:14px;
+    margin-bottom:14px;
+  }
+  .result-icon{
+    width:40px; height:40px; flex-shrink:0;
+    border-radius:50%;
+    background:rgba(79,168,160,.15);
+    color:var(--good);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:800;
+  }
+  .result-card b{ display:block; font-size:14px; }
+  .result-card small{ font-size:11px; color:var(--text-dim); }
+  .reward-list{ list-style:none; margin:0 0 4px; padding:0; }
+  .reward-list li{
+    font-size:13px; padding:6px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .reward-list li:last-child{ border-bottom:none; }
+  .reward-list .level-up{ color:var(--accent-strong); font-weight:800; }
+
+  .stat-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:9px;
+    margin-bottom:16px;
+  }
+  .stat-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:12px;
+  }
+  .stat-box b{ display:block; font-size:12.5px; margin-bottom:3px; }
+  .stat-box span{ font-size:18px; font-weight:900; color:var(--accent-strong); }
+
+  .notice{
+    font-size:12px; padding:10px 12px;
+    border-radius:var(--radius-sm);
+    margin-bottom:12px;
+  }
+  .notice-warn{ background:rgba(193,68,60,.12); color:#e8827b; border:1px solid rgba(193,68,60,.3); }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;
+    bottom:calc(20px + env(safe-area-inset-bottom, 0px));
+    left:50%;
+    transform:translate(-50%, 12px);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-size:12.5px; font-weight:600;
+    padding:10px 18px;
+    border-radius:999px;
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:80;
+    max-width:88%;
+    text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translate(-50%, 0); }
+  .toast-warn{ border-color:rgba(193,68,60,.5); }
+  .toast-good{ border-color:rgba(79,168,160,.5); }
+</style>
 </head>
 <body>
 <div class="app">
-<header>
-  <div class="brand"><strong>♠ عصابات الشوارع</strong><span>زعيم المدينة</span></div>
-  <div class="money">💵 <b id="cash">1000</b></div>
-</header>
 
-<section class="hero">
-  <div>
-    <span>المستوى <b id="level">1</b></span>
-    <h1>وسط المدينة</h1>
-    <p>إدارة عصابتك وبناء نفوذك في المدينة</p>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">♠</div>
+      <div class="brand-text">
+        <strong>عصابات الشوارع</strong>
+        <span>زعيم المدينة</span>
+      </div>
+    </div>
+    <div class="cash-pill"><span class="cash-icon">💵</span><b id="cash">0</b></div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-badge"><b id="levelBadge">1</b></div>
+    <div class="hero-content">
+      <h1 id="cityName">وسط المدينة</h1>
+      <p>تدير عصابتك وتبني نفوذك في المدينة، حيّ بعد حيّ.</p>
+    </div>
+  </section>
+
+  <section class="meters">
+    <div>
+      <div class="meter-head"><span>⚡ الطاقة</span><span id="energyLabel">0/0</span></div>
+      <div class="meter-track"><div class="meter-fill" id="energyFill" style="width:0%"></div></div>
+      <small class="meter-note" id="energyNote"></small>
+    </div>
+    <div class="pill-row">
+      <div class="pill-stat"><span>⭐</span><div><b id="respect">0</b><small>احترام</small></div></div>
+      <div class="pill-stat"><span>🏆</span><div><b id="done">0</b><small>مهمات</small></div></div>
+    </div>
+  </section>
+
+  <main>
+    <h2>المدينة</h2>
+    <div class="menu">
+      <button class="tile" data-action="open-missions"><span class="tile-icon">⚔️</span><b>المهمات</b><small>نفّذ المهام واكسب المال والخبرة</small></button>
+      <button class="tile" data-action="open-training"><span class="tile-icon">🏋️</span><b>التدريب</b><small>طوّر مهارات شخصيتك</small></button>
+      <button class="tile" data-action="open-market"><span class="tile-icon">🛒</span><b>التسوق</b><small>اشترِ معدات جديدة</small></button>
+      <button class="tile" data-action="open-trade"><span class="tile-icon">📦</span><b>التجارة</b><small>اشترِ وبِع لتحقيق الأرباح</small></button>
+      <button class="tile" data-action="open-base"><span class="tile-icon">🏢</span><b>المقر</b><small>تابع مستوى عصابتك</small></button>
+      <button class="tile" data-action="open-profile"><span class="tile-icon">👤</span><b>ملفي</b><small>الإحصاءات والقدرات</small></button>
+    </div>
+  </main>
+
+  <div id="screen" class="sheet-overlay">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h2 id="sheetTitle"></h2>
+        <button id="closeSheet" aria-label="إغلاق">×</button>
+      </div>
+      <div id="content" class="sheet-content"></div>
+    </div>
   </div>
-  <div class="avatar">👤</div>
-</section>
 
-<section class="stats">
-  <div><b>⭐ <span id="respect">10</span></b><small>احترام</small></div>
-  <div><b>⚡ <span id="energy">100</span></b><small>طاقة</small></div>
-  <div><b>🏆 <span id="done">0</span></b><small>مهمات</small></div>
-</section>
-
-<main>
-  <h2>المدينة</h2>
-  <div class="menu">
-    <button data-a="missions"><span>⚔️</span><b>المهمات</b><small>نفّذ المهام واكسب المال والخبرة</small><i>›</i></button>
-    <button data-a="training"><span>🏋️</span><b>التدريب</b><small>طوّر مهارات شخصيتك</small><i>›</i></button>
-    <button data-a="market"><span>🛒</span><b>التسوق</b><small>اشترِ معدات جديدة</small><i>›</i></button>
-    <button data-a="trade"><span>📦</span><b>التجارة</b><small>اشترِ وبِع لتحقيق الأرباح</small><i>›</i></button>
-    <button data-a="base"><span>🏢</span><b>المقر</b><small>تابع مستوى عصابتك</small><i>›</i></button>
-    <button data-a="profile"><span>👤</span><b>ملفي</b><small>الإحصاءات والقدرات</small><i>›</i></button>
-  </div>
-</main>
-
-<div id="screen">
-  <div class="panel">
-    <button id="close">×</button>
-    <div id="content"></div>
-  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </div>
-</div>
-<script src="game.js"></script>
-</body>
-</html>
+
+<script>
+(function(){
+  "use strict";
+
+  var KEY = "street-gangs-save-v5";
+  var ENERGY_REGEN_MS = 3 * 60 * 1000; // 1 energy point every 3 minutes
+
+  var CONFIG = {
+    cities: [
+      { id:"downtown",   name:"وسط المدينة",     mult:1.00 },
+      { id:"port",       name:"الميناء",          mult:1.25 },
+      { id:"industrial", name:"المنطقة الصناعية", mult:0.80 }
+    ],
+    goods: [
+      { id:"wood",      icon:"🪵", name:"خشب",       base:60 },
+      { id:"wheat",     icon:"🌾", name:"قمح",       base:45 },
+      { id:"fruit",     icon:"🍎", name:"فواكه",     base:70 },
+      { id:"materials", icon:"🧱", name:"مواد بناء", base:100 }
+    ],
+    missions: [
+      { id:"delivery", icon:"📦",  name:"توصيل شحنة",       diff:"سهلة",   energy:15, cash:80,  xp:20 },
+      { id:"race",     icon:"🏁",  name:"سباق الشوارع",      diff:"متوسطة", energy:20, cash:140, xp:35 },
+      { id:"turf",     icon:"🏙️", name:"توسيع النفوذ",      diff:"صعبة",   energy:28, cash:250, xp:55 },
+      { id:"deal",     icon:"🤝",  name:"اتفاق مع حي جديد",  diff:"خبيرة",  energy:35, cash:400, xp:80 }
+    ],
+    market: [
+      { id:"vest",  icon:"🦺", name:"سترة حماية",   desc:"دفاع +2",  price:180, stat:"defense",  amount:2 },
+      { id:"shoes", icon:"👟", name:"حذاء رياضي",   desc:"سرعة +2",  price:200, stat:"speed",    amount:2 },
+      { id:"gear",  icon:"🥊", name:"معدات تدريب",  desc:"قوة +2",   price:220, stat:"power",    amount:2 },
+      { id:"scope", icon:"🎯", name:"معدات تركيز",  desc:"دقة +2",   price:240, stat:"accuracy", amount:2 }
+    ],
+    skills: [
+      { key:"power",    icon:"💪", name:"القوة" },
+      { key:"defense",  icon:"🛡️", name:"الدفاع" },
+      { key:"speed",    icon:"🏃", name:"السرعة" },
+      { key:"accuracy", icon:"🎯", name:"الدقة" }
+    ]
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+  }); }
+
+  function xpNeeded(level){ return level * 100; }
+  function energyMaxFor(level){ return 100 + (level - 1) * 10; }
+
+  function defaultState(){
+    return {
+      cash: 1000,
+      energy: 100,
+      energyMax: 100,
+      respect: 10,
+      level: 1,
+      xp: 0,
+      done: 0,
+      stamina: 4,
+      cityId: "downtown",
+      stats: { power:5, defense:5, speed:5, accuracy:5 },
+      inv: {},
+      lastEnergyTs: Date.now()
+    };
+  }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        var merged = Object.assign(defaultState(), parsed);
+        merged.stats = Object.assign(defaultState().stats, parsed.stats || {});
+        merged.energyMax = Math.max(merged.energyMax, energyMaxFor(merged.level));
+        merged.energy = Math.min(merged.energy, merged.energyMax);
+        return merged;
+      }
+    }catch(e){ /* storage unavailable — fall back to defaults */ }
+    return defaultState();
+  }
+
+  var state = loadState();
+  var storageOK = true;
+
+  function persist(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch(e){ storageOK = false; }
+  }
+
+  function commit(){ persist(); renderAll(); }
+
+  // ---------- rendering ----------
+  function renderHeader(){
+    $("cash").textContent = state.cash.toLocaleString("ar-EG");
+    $("levelBadge").textContent = state.level;
+    var city = CONFIG.cities.find(function(c){ return c.id === state.cityId; });
+    $("cityName").textContent = city ? city.name : "وسط المدينة";
+    $("respect").textContent = state.respect;
+    $("done").textContent = state.done;
+  }
+
+  function renderEnergy(){
+    var pct = Math.max(0, Math.min(100, (state.energy / state.energyMax) * 100));
+    $("energyFill").style.width = pct + "%";
+    $("energyLabel").textContent = state.energy + "/" + state.energyMax;
+    var note = $("energyNote");
+    if(state.energy >= state.energyMax){
+      note.textContent = "الطاقة ممتلئة";
+    } else {
+      var elapsed = Date.now() - state.lastEnergyTs;
+      var remain = ENERGY_REGEN_MS - (elapsed % ENERGY_REGEN_MS);
+      var mm = Math.floor(remain / 60000);
+      var ss = Math.floor((remain % 60000) / 1000);
+      note.textContent = "نقطة طاقة جديدة خلال " + mm + ":" + (ss < 10 ? "0" : "") + ss;
+    }
+  }
+
+  function renderAll(){ renderHeader(); renderEnergy(); }
+
+  function energyTick(){
+    var now = Date.now();
+    var elapsed = now - state.lastEnergyTs;
+    var gained = Math.floor(elapsed / ENERGY_REGEN_MS);
+    if(gained > 0){
+      if(state.energy < state.energyMax){
+        var add = Math.min(gained, state.energyMax - state.energy);
+        state.energy += add;
+      }
+      state.lastEnergyTs += gained * ENERGY_REGEN_MS;
+      persist();
+    }
+    renderEnergy();
+  }
+
+  // ---------- sheet ----------
+  var sheetOpen = false;
+  function openSheet(title, html){
+    $("sheetTitle").textContent = title;
+    $("content").innerHTML = html;
+    $("content").scrollTop = 0;
+    if(!sheetOpen){
+      $("screen").classList.add("open");
+      document.body.style.overflow = "hidden";
+      sheetOpen = true;
+    }
+  }
+  function closeSheet(){
+    $("screen").classList.remove("open");
+    document.body.style.overflow = "";
+    sheetOpen = false;
+  }
+
+  var toastTimer = null;
+  function toast(msg, kind){
+    va
