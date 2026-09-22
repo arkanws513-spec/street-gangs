@@ -626,4 +626,234 @@
 
   var toastTimer = null;
   function toast(msg, kind){
-    va
+    var el = $("toast");
+    el.textContent = msg;
+    el.className = "toast show" + (kind ? " toast-" + kind : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2200);
+  }
+
+  function spendEnergy(cost){
+    if(state.energy < cost){
+      toast("لا توجد طاقة كافية", "warn");
+      return false;
+    }
+    state.energy -= cost;
+    return true;
+  }
+
+  function addXP(amount){
+    var leveled = false;
+    state.xp += amount;
+    while(state.xp >= xpNeeded(state.level)){
+      state.xp -= xpNeeded(state.level);
+      state.level += 1;
+      state.energyMax = energyMaxFor(state.level);
+      state.energy = state.energyMax;
+      leveled = true;
+    }
+    return leveled;
+  }
+
+  function missionHTML(){
+    var xpNext = xpNeeded(state.level);
+    var html = '<p class="sheet-sub">اختر مهمة. كل مهمة تستهلك طاقة وتعطيك مالاً وخبرة واحتراماً.</p>';
+    html += '<div class="progress-line"><span>خبرة المستوى</span><b>' + state.xp + ' / ' + xpNext + '</b></div>';
+    CONFIG.missions.forEach(function(m){
+      html += '<div class="row-card">';
+      html += '<div class="row-icon">' + m.icon + '</div>';
+      html += '<div class="row-info"><b>' + esc(m.name) + '</b><small>' + m.diff + ' • ⚡ ' + m.energy + ' • 💵 ' + m.cash + ' • XP ' + m.xp + '</small></div>';
+      html += '<button class="btn btn-small" data-do="mission" data-id="' + m.id + '">ابدأ</button>';
+      html += '</div>';
+    });
+    return html;
+  }
+
+  function trainingHTML(){
+    var html = '<p class="sheet-sub">درّب مهارة واحدة مقابل الطاقة. كل تدريب يرفع المهارة نقطة واحدة.</p>';
+    CONFIG.skills.forEach(function(s){
+      html += '<div class="skill-row"><div><b>' + s.icon + ' ' + s.name + '</b><small>المستوى الحالي: ' + state.stats[s.key] + '</small></div>';
+      html += '<button class="btn btn-small" data-do="train" data-id="' + s.key + '">تدريب • ⚡ 10</button></div>';
+    });
+    return html;
+  }
+
+  function marketHTML(){
+    var html = '<p class="sheet-sub">معدات دائمة. شراء القطعة يرفع إحدى مهاراتك مباشرة.</p>';
+    CONFIG.market.forEach(function(item){
+      html += '<div class="row-card"><div class="row-icon">' + item.icon + '</div>';
+      html += '<div class="row-info"><b>' + item.name + '</b><small>' + item.desc + ' • 💵 ' + item.price + '</small></div>';
+      html += '<button class="btn btn-small" data-do="buy-market" data-id="' + item.id + '">شراء</button></div>';
+    });
+    return html;
+  }
+
+  function tradeHTML(){
+    var city = CONFIG.cities.find(function(c){ return c.id === state.cityId; }) || CONFIG.cities[0];
+    var html = '<p class="sheet-sub">المدينة الحالية: <b>' + city.name + '</b>. الأسعار تتغير حسب المدينة.</p>';
+    html += '<div class="chip-row">';
+    CONFIG.cities.forEach(function(c){
+      html += '<button class="chip ' + (c.id === state.cityId ? 'chip-active' : '') + '" data-do="city" data-id="' + c.id + '">' + c.name + '</button>';
+    });
+    html += '</div>';
+    CONFIG.goods.forEach(function(g){
+      var buy = Math.round(g.base * city.mult);
+      var sell = Math.round(buy * 0.72);
+      var qty = state.inv[g.id] || 0;
+      html += '<div class="row-card"><div class="row-icon">' + g.icon + '</div>';
+      html += '<div class="row-info"><b>' + g.name + '</b><small>شراء ' + buy + ' • بيع ' + sell + ' • معك: ' + qty + '</small></div>';
+      html += '<div class="row-actions"><button class="btn btn-small" data-do="buy-good" data-id="' + g.id + '">+</button>';
+      html += '<button class="btn btn-small btn-ghost" data-do="sell-good" data-id="' + g.id + '">−</button></div></div>';
+    });
+    return html;
+  }
+
+  function baseHTML(){
+    var totalStats = state.stats.power + state.stats.defense + state.stats.speed + state.stats.accuracy;
+    return '<p class="sheet-sub">المقر هو مركز عصابتك. كلما ارتفع مستواك زادت طاقتك القصوى.</p>' +
+      '<div class="stat-grid"><div class="stat-box"><b>المستوى</b><span>' + state.level + '</span></div>' +
+      '<div class="stat-box"><b>الاحترام</b><span>' + state.respect + '</span></div>' +
+      '<div class="stat-box"><b>إجمالي المهارات</b><span>' + totalStats + '</span></div>' +
+      '<div class="stat-box"><b>المهمات المكتملة</b><span>' + state.done + '</span></div></div>' +
+      '<button class="btn btn-block" data-do="rest">استعادة الطاقة</button>';
+  }
+
+  function profileHTML(){
+    var html = '<p class="sheet-sub">إحصاءات شخصيتك الحالية.</p>';
+    CONFIG.skills.forEach(function(s){
+      html += '<div class="skill-row"><div><b>' + s.icon + ' ' + s.name + '</b><small>النقاط المكتسبة</small></div><strong>' + state.stats[s.key] + '</strong></div>';
+    });
+    html += '<div class="stat-grid"><div class="stat-box"><b>المال</b><span>' + state.cash.toLocaleString("ar-EG") + '</span></div>' +
+      '<div class="stat-box"><b>الخبرة</b><span>' + state.xp + '</span></div></div>';
+    return html;
+  }
+
+  function openAction(action){
+    if(action === "open-missions") openSheet("المهمات", missionHTML());
+    else if(action === "open-training") openSheet("التدريب", trainingHTML());
+    else if(action === "open-market") openSheet("التسوق", marketHTML());
+    else if(action === "open-trade") openSheet("التجارة", tradeHTML());
+    else if(action === "open-base") openSheet("المقر", baseHTML());
+    else if(action === "open-profile") openSheet("ملفي", profileHTML());
+  }
+
+  function runMission(id){
+    var m = CONFIG.missions.find(function(x){ return x.id === id; });
+    if(!m) return;
+    if(!spendEnergy(m.energy)) return;
+    state.cash += m.cash;
+    state.done += 1;
+    state.respect += Math.max(1, Math.ceil(m.xp / 20));
+    var levelUp = addXP(m.xp);
+    commit();
+    openSheet("المهمات", '<div class="result-card"><div class="result-icon">✓</div><div><b>تمت المهمة بنجاح</b><small>' + m.name + '</small></div></div>' +
+      '<ul class="reward-list"><li>💵 +' + m.cash + '</li><li>⭐ احترام +' + Math.max(1, Math.ceil(m.xp / 20)) + '</li><li>✨ XP +' + m.xp + '</li>' +
+      (levelUp ? '<li class="level-up">🎉 ارتقيت إلى المستوى ' + state.level + '</li>' : '') + '</ul>' +
+      '<button class="btn btn-block" data-do="back-missions">مهمة أخرى</button>');
+    toast(levelUp ? "مبروك! ارتقيت في المستوى" : "تم تنفيذ المهمة", "good");
+  }
+
+  function trainSkill(key){
+    var s = CONFIG.skills.find(function(x){ return x.key === key; });
+    if(!s) return;
+    if(!spendEnergy(10)) return;
+    state.stats[key] += 1;
+    state.respect += 1;
+    commit();
+    openSheet("التدريب", trainingHTML());
+    toast("تم تطوير " + s.name + " +1", "good");
+  }
+
+  function buyMarket(id){
+    var item = CONFIG.market.find(function(x){ return x.id === id; });
+    if(!item) return;
+    if(state.cash < item.price){ toast("المال غير كافٍ", "warn"); return; }
+    state.cash -= item.price;
+    state.stats[item.stat] += item.amount;
+    state.inv[item.id] = (state.inv[item.id] || 0) + 1;
+    commit();
+    openSheet("التسوق", marketHTML());
+    toast("تم شراء " + item.name, "good");
+  }
+
+  function buyGood(id){
+    var city = CONFIG.cities.find(function(c){ return c.id === state.cityId; }) || CONFIG.cities[0];
+    var g = CONFIG.goods.find(function(x){ return x.id === id; });
+    if(!g) return;
+    var price = Math.round(g.base * city.mult);
+    if(state.cash < price){ toast("المال غير كافٍ", "warn"); return; }
+    state.cash -= price;
+    state.inv[g.id] = (state.inv[g.id] || 0) + 1;
+    commit();
+    openSheet("التجارة", tradeHTML());
+    toast("تم شراء " + g.name, "good");
+  }
+
+  function sellGood(id){
+    var city = CONFIG.cities.find(function(c){ return c.id === state.cityId; }) || CONFIG.cities[0];
+    var g = CONFIG.goods.find(function(x){ return x.id === id; });
+    if(!g) return;
+    var qty = state.inv[g.id] || 0;
+    if(qty <= 0){ toast("لا تملك هذه السلعة", "warn"); return; }
+    var sell = Math.round(g.base * city.mult * 0.72);
+    state.inv[g.id] = qty - 1;
+    state.cash += sell;
+    commit();
+    openSheet("التجارة", tradeHTML());
+    toast("تم بيع " + g.name, "good");
+  }
+
+  function changeCity(id){
+    if(!CONFIG.cities.some(function(c){ return c.id === id; })) return;
+    state.cityId = id;
+    persist();
+    openSheet("التجارة", tradeHTML());
+    renderAll();
+    toast("انتقلت إلى " + (CONFIG.cities.find(function(c){ return c.id === id; }) || CONFIG.cities[0]).name, "good");
+  }
+
+  function rest(){
+    var missing = state.energyMax - state.energy;
+    if(missing <= 0){ toast("طاقتك ممتلئة"); return; }
+    state.energy = state.energyMax;
+    state.lastEnergyTs = Date.now();
+    commit();
+    openSheet("المقر", baseHTML());
+    toast("تم استعادة الطاقة", "good");
+  }
+
+  document.addEventListener("click", function(e){
+    var tile = e.target.closest("[data-action]");
+    if(tile){ openAction(tile.getAttribute("data-action")); return; }
+
+    var action = e.target.closest("[data-do]");
+    if(!action) return;
+    var type = action.getAttribute("data-do");
+    var id = action.getAttribute("data-id");
+
+    if(type === "mission") runMission(id);
+    else if(type === "train") trainSkill(id);
+    else if(type === "buy-market") buyMarket(id);
+    else if(type === "buy-good") buyGood(id);
+    else if(type === "sell-good") sellGood(id);
+    else if(type === "city") changeCity(id);
+    else if(type === "rest") rest();
+    else if(type === "back-missions") openSheet("المهمات", missionHTML());
+  });
+
+  $("closeSheet").addEventListener("click", closeSheet);
+  $("screen").addEventListener("click", function(e){
+    if(e.target === $("screen")) closeSheet();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && sheetOpen) closeSheet();
+  });
+
+  setInterval(energyTick, 1000);
+  renderAll();
+  persist();
+})(); 
+</script>
+</body>
+</html>
