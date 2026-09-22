@@ -1,27 +1,10 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>عصابات الشوارع</title><link rel="stylesheet" href="style.css"></head>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>عصابات الشوارع — مدينة ثلاثية الأبعاد</title><link rel="stylesheet" href="style.css"></head>
 <body><div class="game">
 <header><div class="avatar">♟</div><div class="brand"><b>زعيم الشوارع</b><small>المستوى <strong id="level">1</strong></small></div><div class="res"><span>💵 <b id="cash">1000</b></span><span>⚡ <b id="energy">100</b></span><span>🪙 <b id="respect">10</b></span></div><button id="reset">↻</button></header>
 <section class="xp"><div><b>المستوى <span id="level2">1</span></b><span id="xpText">0 / 100 XP</span></div><i><em id="xpFill"></em></i><small>نقاط التحمل: <b id="stamina">0</b></small></section>
-<main id="worldViewport" class="world-viewport">
-  <div id="world" class="world">
-    <div class="skyline"></div><div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
-    <div class="water"></div><div class="park p1"></div><div class="park p2"></div>
-    <div class="road road1"></div><div class="road road2"></div><div class="road road3"></div><div class="road road4"></div>
-    <div class="district d1">الحَيّ التجاري</div><div class="district d2">المنطقة الصناعية</div><div class="district d3">الأحياء السكنية</div><div class="district d4">الميناء</div>
-    <div class="map-title"><small>الخريطة الرئيسية</small><h1>وسط المدينة</h1><span>اسحب الخريطة للتحرك في كل الاتجاهات</span></div>
-    <button class="building b1" data-a="missions"><div class="roof"></div><div class="facade">⚔️<span>MISSION HQ</span></div><b>مركز المهمات</b><small>عقود ومعارك</small></button>
-    <button class="building b2" data-a="training"><div class="roof"></div><div class="facade">🏋️<span>FITNESS</span></div><b>مركز التدريب</b><small>قوة • دفاع • سرعة • دقة</small></button>
-    <button class="building b3" data-a="market"><div class="roof"></div><div class="facade">🛒<span>MARKET</span></div><b>مركز التسوق</b><small>معدات وتطويرات</small></button>
-    <button class="building b4" data-a="trade"><div class="roof"></div><div class="facade">🏦<span>TRADE</span></div><b>سوق التجارة</b><small>شراء وبيع بين المدن</small></button>
-    <button class="building b5" data-a="base"><div class="roof"></div><div class="facade">🏢<span>BASE</span></div><b>مقر العصابة</b><small>المقر الرئيسي</small></button>
-    <button class="building b6" data-a="profile"><div class="roof"></div><div class="facade">👤<span>PROFILE</span></div><b>ملفي</b><small>الإحصاءات والإنجازات</small></button>
-    <div class="tower t1"></div><div class="tower t2"></div><div class="tower t3"></div>
-    <div class="cars"><i></i><i></i><i></i><i></i></div>
-  </div>
-  <div class="map-hud"><span>🧭</span><b>خريطة حرة</b><small>اسحب • حرّك • استكشف</small></div>
-  <div class="zoom-hint">✦ عالم مفتوح</div>
-</main>
+<main id="cityStage"><canvas id="city3d"></canvas><div class="city-ui"><div class="city-title"><small>عالم عصابات الشوارع</small><h1>وسط المدينة</h1><span>مدينة ثلاثية الأبعاد — اسحب للتحرك، قرّب وابتعد، واضغط على المباني</span></div><div class="city-help"><b>◈ استكشف المدينة</b><small>سحب • دوران • تكبير</small></div><div id="buildingHint" class="building-hint">اقترب من مبنى لاكتشافه</div></div></main>
 <section class="feed"><b>آخر الأحداث</b><div id="log"></div></section>
 <nav><button data-a="home">⌂<small>المدينة</small></button><button data-a="missions">⚔<small>المهمات</small></button><button data-a="training">🏋<small>التدريب</small></button><button data-a="market">🛒<small>التسوق</small></button><button data-a="trade">📦<small>التجارة</small></button></nav></div>
-<div id="screen"><div class="panel"><button id="close">×</button><div id="content"></div></div></div><script src="game.js"></script></body></html>
+<div id="screen"><div class="panel"><button id="close">×</button><div id="content"></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script><script src="scene.js"></script><script src="game.js"></script></body></html>
