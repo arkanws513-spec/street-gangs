@@ -3,34 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>عالم المافيا</title>
+<title>عصابات الشوارع</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top"><div><div class="brand">عالم المافيا</div><div class="sub">مدينة واحدة… ونفوذ بلا حدود</div></div><button id="reset">إعادة اللعبة</button></header>
+<div class="app-shell">
+<header class="topbar">
+  <div class="brand-wrap">
+    <div class="logo-mark">SG</div>
+    <div><div class="brand">عصابات الشوارع</div><div class="sub">ابنِ نفوذك في المدينة</div></div>
+  </div>
+  <button id="reset" class="ghost">↻ إعادة</button>
+</header>
+
 <main>
+<section class="hero">
+  <div class="hero-copy"><span class="eyebrow">المدينة • اليوم</span><h1>السيطرة تبدأ من هنا</h1><p>طوّر مقرك، كوّن فريقك، ووسّع نفوذك خطوة بخطوة.</p></div>
+  <div class="hq-badge"><span>المقر</span><b id="hq">1</b></div>
+</section>
+
 <section class="stats">
-<div><b id="cash">0</b><span>💰 المال</span></div><div><b id="respect">0</b><span>⭐ السمعة</span></div><div><b id="power">0</b><span>🔥 النفوذ</span></div><div><b id="energy">100</b><span>⚡ الطاقة</span></div>
+  <div class="stat"><span class="stat-icon">💰</span><div><b id="cash">0</b><small>المال</small></div></div>
+  <div class="stat"><span class="stat-icon">⭐</span><div><b id="respect">0</b><small>السمعة</small></div></div>
+  <div class="stat"><span class="stat-icon">🔥</span><div><b id="power">0</b><small>النفوذ</small></div></div>
+  <div class="stat"><span class="stat-icon">⚡</span><div><b id="energy">100</b><small>الطاقة</small></div></div>
 </section>
-<section class="city">
-<h2>المدينة</h2>
-<div class="districts">
-<button data-action="work">🏪 الحي التجاري<small>أعمال يومية</small></button>
-<button data-action="property">🏢 العقارات<small>شراء وتطوير</small></button>
-<button data-action="crew">👥 العصابة<small>تجنيد وتطوير</small></button>
-<button data-action="missions">📋 المهمات<small>3 مستويات — نجاح 65%</small></button>
-<button data-action="market">📈 السوق<small>استثمارات</small></button>
-<button data-action="club">🍸 النادي<small>رفع السمعة</small></button>
-</div>
+
+<section class="city-card">
+  <div class="section-head"><div><span class="eyebrow">خريطة المدينة</span><h2>اختر وجهتك</h2></div><span class="online"><i></i> المدينة نشطة</span></div>
+  <div class="city-map">
+    <div class="road road-a"></div><div class="road road-b"></div>
+    <button class="building b-business" data-action="work"><span>🏪</span><b>الحي التجاري</b><small>أعمال يومية</small></button>
+    <button class="building b-property" data-action="property"><span>🏢</span><b>العقارات</b><small>شراء وتطوير</small></button>
+    <button class="building b-crew" data-action="crew"><span>👥</span><b>العصابة</b><small>تجنيد الأفراد</small></button>
+    <button class="building b-missions" data-action="missions"><span>📋</span><b>المهمات</b><small>3 مستويات</small></button>
+    <button class="building b-market" data-action="market"><span>📈</span><b>السوق</b><small>استثمارات</small></button>
+    <button class="building b-club" data-action="club"><span>🎯</span><b>النادي</b><small>رفع السمعة</small></button>
+  </div>
 </section>
-<section class="panel">
-<h2>نشاط المدينة</h2><div id="log" class="log"></div>
+
+<section class="quick-grid">
+  <button class="quick" data-action="missions"><span>📋</span><div><b>مركز المهمات</b><small>نجاح 65% • مكافآت عشوائية</small></div><strong>←</strong></button>
+  <button class="quick" data-action="crew"><span>👥</span><div><b>إدارة العصابة</b><small><b id="members">1</b> أفراد • طوّر نفوذك</small></div><strong>←</strong></button>
 </section>
-<section class="panel">
-<h2>مقر العصابة</h2>
-<div class="crewbar"><span>مستوى المقر <b id="hq">1</b></span><span>أفراد <b id="members">1</b></span></div>
-<button id="upgrade">ترقية المقر — <b id="upgradeCost">500</b> 💰</button>
+
+<section class="panel activity">
+  <div class="section-head"><div><span class="eyebrow">سجل الأحداث</span><h2>نشاط المدينة</h2></div></div>
+  <div id="log" class="log"></div>
+</section>
+
+<section class="panel headquarters">
+  <div class="hq-info"><div class="hq-icon">🏙️</div><div><span>المقر الرئيسي</span><h2>مستوى <b id="hq2">1</b></h2><small>ترقية المقر تمنحك نفوذًا وأفرادًا إضافيين.</small></div></div>
+  <button id="upgrade" class="primary">ترقية المقر <span><b id="upgradeCost">500</b> 💰</span></button>
 </section>
 </main>
+
+<nav class="bottom-nav">
+  <button class="active" data-action="work"><span>🏙️</span>المدينة</button>
+  <button data-action="missions"><span>📋</span>المهمات</button>
+  <button data-action="crew"><span>👥</span>العصابة</button>
+  <button data-action="property"><span>🏢</span>الممتلكات</button>
+  <button data-action="market"><span>⋯</span>المزيد</button>
+</nav>
+
+<div id="missionModal" class="modal" aria-hidden="true">
+  <div class="modal-box">
+    <button class="close" id="closeMissions">×</button>
+    <span class="eyebrow">مركز المهمات</span><h2>اختر مهمة</h2><p class="modal-note">كل مهمة تستهلك طاقة، وفرصة النجاح ثابتة عند 65%.</p>
+    <div class="mission-list">
+      <button class="mission" data-mission="1"><span class="m-icon">Ⅰ</span><div><b>مهمة مبتدئة</b><small>8 ⚡ طاقة • مكافأة 10–50 جنيه</small></div><strong>→</strong></button>
+      <button class="mission" data-mission="2"><span class="m-icon">Ⅱ</span><div><b>مهمة متوسطة</b><small>14 ⚡ طاقة • مكافأة 30–120 جنيه</small></div><strong>→</strong></button>
+      <button class="mission" data-mission="3"><span class="m-icon">Ⅲ</span><div><b>مهمة متقدمة</b><small>20 ⚡ طاقة • مكافأة 75–250 جنيه</small></div><strong>→</strong></button>
+    </div>
+  </div>
+</div>
 <script src="game.js"></script>
 </body></html>
