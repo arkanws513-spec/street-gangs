@@ -33,7 +33,7 @@ for(const [x,z] of[[-31,-14],[-30,4],[-30,22],[-23,29],[-10,31],[10,31],[27,25],
 for(const [x,z] of[[-21,-3],[21,-3],[-22,18],[22,18],[-9,22],[8,-21]])tree(x,z);
 for(const [x,z,r] of[[-22,0,0],[10,0,0],[28,0,0],[-8,-18,0],[8,18,Math.PI],[-18,18,Math.PI]])car(x,z,r,0x3b91b4);
 for(const [x,z] of[[-20,-4],[-7,-4],[7,-4],[20,-4],[-20,16],[-7,16],[7,16],[20,16]])lamp(x,z);
-events(c);applyCamera();animate()}
+events(c);resize();applyCamera();animate()}
 function resize(){const c=document.getElementById("city3d");const a=c.clientWidth/c.clientHeight;const v=18;camera.left=-v;camera.right=v;camera.top=v/a;camera.bottom=-v/a;camera.updateProjectionMatrix();renderer.setSize(c.clientWidth,c.clientHeight,false)}
 function applyCamera(){const a=new THREE.Vector3(28,28,28).normalize().multiplyScalar(zoom);camera.position.copy(focus).add(a);camera.lookAt(focus)}
 function clamp(){focus.x=Math.max(-32,Math.min(32,focus.x));focus.z=Math.max(-30,Math.min(30,focus.z))}
