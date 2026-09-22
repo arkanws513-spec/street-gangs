@@ -1,79 +1,13 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>عصابات الشوارع</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="game">
-  <header class="hud">
-    <div class="profile">
-      <div class="avatar"><span>♟</span><i></i></div>
-      <div class="profile-text"><b>زعيم الشوارع</b><small>المستوى <strong id="hq">1</strong></small></div>
-    </div>
-    <div class="resources">
-      <div class="money"><span>💵</span><b id="cash">0</b><button>+</button></div>
-      <div class="money"><span>🪙</span><b id="respect">0</b><button>+</button></div>
-    </div>
-    <button id="reset" class="reset">↻</button>
-  </header>
-
-  <section class="bars">
-    <div class="bar energy"><div class="bar-top"><span>⚡ طاقة</span><b id="energy">100/100</b></div><i><em id="energyFill"></em></i></div>
-    <div class="bar power"><div class="bar-top"><span>💪 قوة</span><b id="power">5/100</b></div><i><em id="powerFill"></em></i></div>
-    <div class="bar fame"><div class="bar-top"><span>⭐ سمعة</span><b id="respectBar">10/100</b></div><i><em id="respectFill"></em></i></div>
-    <div class="level"><b>LV</b><strong id="level">1</strong><span><em id="xpFill"></em></span><small id="xpText">0 / 100</small></div>
-  </section>
-
-  <main class="city">
-    <div class="sky-glow"></div>
-    <div class="moon"></div>
-    <div class="city-label"><span>المدينة</span><b>وسط المدينة</b></div>
-
-    <div class="road r1"></div><div class="road r2"></div><div class="road r3"></div>
-    <div class="lane l1"></div><div class="lane l2"></div>
-    <div class="tree t1">🌴</div><div class="tree t2">🌴</div><div class="tree t3">🌴</div><div class="tree t4">🌴</div>
-    <div class="lamp lp1">✦</div><div class="lamp lp2">✦</div><div class="lamp lp3">✦</div>
-
-    <button class="place p-business" data-action="work"><span class="place-art">🏪</span><b>مركز المعاملات</b><small>أعمال</small></button>
-    <button class="place p-club" data-action="club"><span class="place-art">🎯</span><b>نادي القتال</b><small>سمعة</small></button>
-    <button class="place p-mission" data-action="missions"><span class="place-art">📋</span><b>مركز المهمات</b><small>مهام يومية</small><i class="badge">!</i></button>
-    <button class="place p-market" data-action="market"><span class="place-art">🏬</span><b>مركز التسوق</b><small>استثمارات</small></button>
-    <button class="place p-property" data-action="property"><span class="place-art">🏢</span><b>الممتلكات</b><small>توسّع</small></button>
-    <button class="place p-crew" data-action="crew"><span class="place-art">👥</span><b>مقر العصابة</b><small>الأفراد: <span id="members">1</span></small></button>
-
-    <div class="car c1">🚕</div><div class="car c2">🚙</div>
-    <div class="event-card"><span>⚡</span><div><b>نشاط المدينة</b><small>اضغط على أي مبنى للبدء</small></div></div>
-  </main>
-
-  <section class="feed"><div class="feed-title">آخر الأحداث <small>● مباشر</small></div><div id="log" class="log"></div></section>
-
-  <section class="upgrade-card">
-    <div><span>🏙️</span><div><b>مقر العصابة</b><small>المستوى <strong id="hq2">1</strong> • أفراد إضافيون عند الترقية</small></div></div>
-    <button id="upgrade">ترقية <b id="upgradeCost">500</b> 💵</button>
-  </section>
-
-  <nav class="nav">
-    <button class="selected" data-action="work"><span>⌂</span>المدينة</button>
-    <button data-action="crew"><span>♟</span>ملفي</button>
-    <button data-action="property"><span>▣</span>ممتلكات</button>
-    <button data-action="missions"><span>☷</span>مهمات</button>
-    <button data-action="market"><span>⋮</span>المزيد</button>
-  </nav>
-</div>
-
-<div id="missionModal" class="modal" aria-hidden="true">
- <div class="modal-box">
-  <button class="close" id="closeMissions">×</button>
-  <span class="kicker">مركز المهمات</span><h2>اختر مهمتك</h2><p>فرصة النجاح 65% — كل مهمة تستهلك طاقة.</p>
-  <div class="mission-list">
-   <button class="mission" data-mission="1"><span>Ⅰ</span><div><b>مهمة مبتدئة</b><small>8 ⚡ • 10–50 جنيه</small></div><strong>›</strong></button>
-   <button class="mission" data-mission="2"><span>Ⅱ</span><div><b>مهمة متوسطة</b><small>14 ⚡ • 30–120 جنيه</small></div><strong>›</strong></button>
-   <button class="mission" data-mission="3"><span>Ⅲ</span><div><b>مهمة متقدمة</b><small>20 ⚡ • 75–250 جنيه</small></div><strong>›</strong></button>
-  </div>
- </div>
-</div>
-<script src="game.js"></script>
-</body></html>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>عصابات الشوارع</title><link rel="stylesheet" href="style.css"></head><body><div class="game">
+<header><div class="avatar">♟</div><div><b>زعيم الشوارع</b><small>المستوى <strong id="level">1</strong></small></div><div class="res">💵 <b id="cash">1000</b>　⚡ <b id="energy">100</b>　🪙 <b id="respect">10</b></div><button id="reset">↻</button></header>
+<section class="xp"><div><b>المستوى <span id="level2">1</span></b><span id="xpText">0 / 100 XP</span></div><i><em id="xpFill"></em></i><small>نقاط التحمل: <b id="stamina">0</b></small></section>
+<main class="city"><div class="title"><small>الخريطة الرئيسية</small><h1>وسط المدينة</h1></div>
+<div class="building one" data-a="missions"><div>📋</div><b>مركز المهمات</b><small>عقود ومعارك</small></div>
+<div class="building two" data-a="training"><div>🏋️</div><b>مركز التدريب</b><small>قوة • دفاع • سرعة • دقة</small></div>
+<div class="building three" data-a="market"><div>🏬</div><b>مركز التسوق</b><small>معدات وأدوات</small></div>
+<div class="building four" data-a="trade"><div>📦</div><b>سوق التجارة</b><small>شراء وبيع بين المدن</small></div>
+<div class="building five" data-a="base"><div>🏢</div><b>مقر العصابة</b><small>إدارة العصابة</small></div>
+<div class="building six" data-a="profile"><div>👤</div><b>ملفي</b><small>الإحصاءات</small></div><div class="road"></div><div class="road r2"></div></main>
+<section class="feed"><b>آخر الأحداث</b><div id="log"></div></section>
+<nav><button data-a="home">⌂<small>المدينة</small></button><button data-a="missions">⚔<small>المهمات</small></button><button data-a="training">🏋<small>التدريب</small></button><button data-a="market">🛒<small>التسوق</small></button><button data-a="trade">📦<small>التجارة</small></button></nav></div>
+<div id="screen"><div class="panel"><button id="close">×</button><div id="content"></div></div></div><script src="game.js"></script></body></html>
