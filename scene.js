@@ -42,7 +42,7 @@ c.style.touchAction="none";
 c.addEventListener("pointerdown",e=>{dragging=true;moved=false;velX=velZ=0;lastX=e.clientX;lastY=e.clientY;lastT=performance.now();c.setPointerCapture(e.pointerId)});
 c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;
 if(dragging){const now=performance.now(),dt=Math.max(8,now-lastT),dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
-const k=.055;focus.x-=dx*k;focus.z+=dy*k;velX=-dx*k*(16.67/dt);velZ=dy*k*(16.67/dt);clamp();applyCamera();lastT=now}lastX=e.clientX;lastY=e.clientY;
+const k=.055;focus.x+=dx*k;focus.z-=dy*k;velX=dx*k*(16.67/dt);velZ=-dy*k*(16.67/dt);clamp();applyCamera();lastT=now}lastX=e.clientX;lastY=e.clientY;
 raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.name))g=g.parent;const h=document.getElementById("buildingHint");if(g&&g.userData.action!=="none"){h.textContent=g.userData.name+"  •  اضغط للدخول";h.classList.add("show")}else h.classList.remove("show")});
 c.addEventListener("pointerup",e=>{dragging=false;if(moved)return;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.action))g=g.parent;if(g&&g.userData.action!=="none"&&typeof act==="function")act(g.userData.action)});
 c.addEventListener("pointercancel",()=>dragging=false);
