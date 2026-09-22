@@ -22,13 +22,13 @@ raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
 scene.add(new THREE.HemisphereLight(0xd7f1ff,0x273221,2.0));const sun=new THREE.DirectionalLight(0xffdfaa,3.1);sun.position.set(-25,45,18);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
 scene.add(box([100,.3,82],[0,-.22,0],0x687854));
 road(0,0,95,8,0);road(0,0,8,82,0);road(0,-18,95,7,0);road(-25,0,7,82,0);road(25,0,7,82,0);
-building("مركز المهمات","missions",-14,-10,7,4.6,6,0x394d56,0xd4aa4a,"معارك • عقود");
-building("مركز التدريب","training",-2,-10,7,4.1,6,0x355a4c,0x65c79a,"قوة • دفاع • سرعة");
-building("مركز التسوق","market",14,-10,8,4.8,7,0x42536a,0x58c5df,"معدات • تطويرات");
-building("سوق التجارة","trade",-15,11,8,4.3,7,0x5b4736,0xe0b85d,"شراء • بيع • سفر");
-building("مقر العصابة","base",0,11,9,5.4,8,0x473942,0xc96868,"المقر الرئيسي");
-building("ملفي","profile",15,11,7,3.8,6,0x48565b,0xb9d3da,"الإحصاءات");
-building("مركز المدينة","none",0,27,7,7.5,7,0x394a55,0x78a9b8,"منطقة مركزية");
+building("مركز المهمات","missions",-9,-5,7,4.2,5.5,0x394d56,0xd4aa4a,"معارك • عقود");
+building("مركز التدريب","training",0,-5,7,4.0,5.5,0x355a4c,0x65c79a,"قوة • دفاع • سرعة");
+building("مركز التسوق","market",9,-5,7.5,4.3,5.8,0x42536a,0x58c5df,"معدات • تطويرات");
+building("سوق التجارة","trade",-9,5,7.5,4.1,5.8,0x5b4736,0xe0b85d,"شراء • بيع • سفر");
+building("مقر العصابة","base",0,5,8,4.8,6.5,0x473942,0xc96868,"المقر الرئيسي");
+building("ملفي","profile",9,5,7,3.8,5.5,0x48565b,0xb9d3da,"الإحصاءات");
+building("مركز المدينة","none",0,12,6,3.2,5,0x394a55,0x78a9b8,"منطقة مركزية");
 for(const [x,z] of[[-31,-14],[-30,4],[-30,22],[-23,29],[-10,31],[10,31],[27,25],[31,8],[31,-10],[25,-27],[8,-28],[-10,-29]])palm(x,z);
 for(const [x,z] of[[-21,-3],[21,-3],[-22,18],[22,18],[-9,22],[8,-21]])tree(x,z);
 for(const [x,z,r] of[[-22,0,0],[10,0,0],[28,0,0],[-8,-18,0],[8,18,Math.PI],[-18,18,Math.PI]])car(x,z,r,0x3b91b4);
@@ -46,7 +46,7 @@ function events(c){
  c.style.touchAction="none";
  let dragStartX=0,dragStartY=0;
  let focusStart=new THREE.Vector3();
- let panScaleX=0,panScaleZ=0;
+ let panScaleZ=0;
  c.addEventListener("pointerdown",e=>{
   updatePointer(c,e);
   dragging=true;moved=false;velX=velZ=0;
@@ -54,8 +54,6 @@ function events(c){
   focusStart.copy(focus);
   const r=c.getBoundingClientRect();
   const viewH=(camera.top-camera.bottom);
-  const viewW=(camera.right-camera.left);
-  panScaleX=viewW/r.width;
   panScaleZ=viewH/r.height;
   lastX=e.clientX;lastY=e.clientY;lastT=performance.now();
   c.setPointerCapture(e.pointerId);
@@ -64,21 +62,12 @@ function events(c){
   updatePointer(c,e);
   if(dragging){
    const now=performance.now(),dt=Math.max(8,now-lastT);
-   const dx=e.clientX-dragStartX,dy=e.clientY-dragStartY;
-   if(Math.abs(dx)+Math.abs(dy)>5)moved=true;
-   /*
-    * Pan is based directly on screen pixels.
-    * The camera angle stays fixed, so both axes are mapped
-    * through the camera's screen basis instead of world X/Z signs.
-    */
-   const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+   const dy=e.clientY-dragStartY;
+   if(Math.abs(dy)>5)moved=true;
    const up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
-   right.y=0;up.y=0;
-   if(right.lengthSq()>0)right.normalize();
+   up.y=0;
    if(up.lengthSq()>0)up.normalize();
-   focus.copy(focusStart)
-    .addScaledVector(right,-dx*panScaleX)
-    .addScaledVector(up,-dy*panScaleZ);
+   focus.copy(focusStart).addScaledVector(up,-dy*panScaleZ);
    clamp();applyCamera();
    velX=(focus.x-focusStart.x)/(Math.max(1,now-lastT)/16.67);
    velZ=(focus.z-focusStart.z)/(Math.max(1,now-lastT)/16.67);
