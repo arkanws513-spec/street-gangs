@@ -1,23 +1,45 @@
-(()=>{let renderer,scene,camera,raycaster,mouse;const targets=[],look=new THREE.Vector3(0,0,0),keys={};let dragging=false,lastX=0,lastY=0,hovered=null,zoom=30;const stage=()=>document.getElementById("cityStage"),hint=()=>document.getElementById("buildingHint");
-function mat(c,rough=.8,metal=0){return new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal})}
-function box(g,p,c){const m=new THREE.Mesh(new THREE.BoxGeometry(...g),mat(c));m.position.set(...p);m.castShadow=m.receiveShadow=true;return m}
-function roof(p,w,d,c){const m=new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*.72,.9,4),mat(c));m.rotation.y=Math.PI/4;m.position.set(...p);m.scale.set(w/Math.max(w,d),1,d/Math.max(w,d));m.castShadow=true;return m}
-function building(name,action,x,z,w,h,d,c,accent){const g=new THREE.Group();g.position.set(x,0,z);g.userData={action,name};g.add(box([w,.5,d],[0,.25,0],0x283238));g.add(box([w,h,d],[0,h/2+.5,0],c));g.add(roof([0,h+1,z*0?0:0],w,d,accent));for(let yy=1.5;yy<h;yy+=1.35){for(let xx=-w/2+1;xx<w/2;xx+=1.35){g.add(box([.45,.55,.06],[xx,yy,d/2+.035],0x91b7c0))}}const sign=box([Math.min(w*.72,6),.65,.12],[0,h*.52+.5,d/2+.08],accent);g.add(sign);g.userData.hit=sign;targets.push(g);scene.add(g);return g}
-function tree(x,z){const g=new THREE.Group();g.add(box([.35,1.8,.35],[0,.9,0],0x5a4030));const l=new THREE.Mesh(new THREE.DodecahedronGeometry(1.15),mat(0x285b3a));l.position.y=2.1;l.castShadow=true;g.add(l);g.position.set(x,0,z);scene.add(g)}
-function car(x,z,r){const g=new THREE.Group();g.position.set(x,.38,z);g.rotation.y=r;g.add(box([2.5,.55,1.2],[0,0,0],0x8d9aa0));g.add(box([1.25,.45,1.0],[0,.45,0],0x344b55));for(const sx of[-.85,.85])for(const sz of[-.55,.55]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.18,12),mat(0x101419));w.rotation.z=Math.PI/2;w.position.set(sx,-.25,sz);g.add(w)}scene.add(g)}
-function road(x,z,w,d,r=0){const m=box([w,.12,d],[x,.02,z],0x242b30);m.rotation.y=r;scene.add(m);const line=box([w*.92,.025,.12],[x,.09,z],0xd2bd61);line.rotation.y=r;scene.add(line)}
-function init(){const c=document.getElementById("city3d");scene=new THREE.Scene();scene.background=new THREE.Color(0x78a8b8);scene.fog=new THREE.Fog(0x78a8b8,42,105);camera=new THREE.PerspectiveCamera(48,c.clientWidth/c.clientHeight,.1,180);camera.position.set(0,24,27);camera.lookAt(look);renderer=new THREE.WebGLRenderer({canvas:c,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(c.clientWidth,c.clientHeight,false);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
-scene.add(new THREE.HemisphereLight(0xc9e9ff,0x23301f,2.1));const sun=new THREE.DirectionalLight(0xffe0a1,3.2);sun.position.set(-25,45,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
-const ground=box([110,.35,90],[0,-.2,0],0x667653);scene.add(ground);road(0,0,110,8);road(0,-16,110,7);road(0,16,110,7);road(-28,0,7,90);road(0,0,7,90);road(28,0,7,90);
-building("مركز المهمات","missions",-18,-12,9,8,7,0x254d67,0xd6aa43);building("مركز التدريب","training",-3,-12,8,7,7,0x315c4c,0x75cfa0);building("مركز التسوق","market",17,-10,10,9,8,0x614b2d,0xe3bd61);building("سوق التجارة","trade",-19,13,10,8,8,0x3f4d65,0x86b7d2);building("مقر العصابة","base",2,13,12,11,9,0x482f39,0xc46b63);building("ملفي","profile",21,12,8,6,7,0x4b5a62,0xb0c7cf);
-building("برج المدينة","none",0,30,8,19,8,0x344650,0x9ab6bf);building("مركز الخدمات","none",-36,-23,9,10,8,0x3e5360,0x8eb3c4);
-for(const [x,z] of[[-43,-12],[-39,7],[-34,22],[-25,27],[-10,29],[10,28],[34,22],[39,5],[38,-17],[25,-25],[10,-27],[-8,-25]])tree(x,z);
-for(const [x,z,r] of[[-30,0,0],[12,0,0],[31,0,0],[-7,-20,0],[7,20,Math.PI],[-12,20,Math.PI]])car(x,z,r);
-events(c);animate()}
-function resize(){if(!renderer)return;const c=document.getElementById("city3d");camera.aspect=c.clientWidth/c.clientHeight;camera.updateProjectionMatrix();renderer.setSize(c.clientWidth,c.clientHeight,false)}
-function clamp(){look.x=Math.max(-40,Math.min(40,look.x));look.z=Math.max(-34,Math.min(34,look.z))}
-function applyCamera(){const a=camera.position.clone().sub(look);a.y=zoom*.72;const horiz=Math.sqrt(a.x*a.x+a.z*a.z)||1;const scale=zoom/horiz;a.x*=scale;a.z*=scale;camera.position.copy(look).add(a);camera.lookAt(look)}
-function events(c){c.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;c.setPointerCapture(e.pointerId)});c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;if(dragging){look.x-=(e.clientX-lastX)*.035;look.z+=(e.clientY-lastY)*.035;clamp();applyCamera()}lastX=e.clientX;lastY=e.clientY;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);const g=hits.length?hits[0].object.parent:null;let root=g;while(root&&root.parent!==scene)root=root.parent;if(root&&root.userData.name){hovered=root;hint().textContent=root.userData.name+" — اضغط للدخول";hint().classList.add("show")}else{hovered=null;hint().classList.remove("show")}});c.addEventListener("pointerup",e=>{if(!dragging)return;dragging=false;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);if(hits.length){let g=hits[0].object;while(g&&(!g.userData||!g.userData.action))g=g.parent;if(g&&g.userData.action&&g.userData.action!=="none"&&typeof act==="function")act(g.userData.action)}});c.addEventListener("wheel",e=>{zoom+=e.deltaY*.018;zoom=Math.max(18,Math.min(43,zoom));applyCamera();e.preventDefault()},{passive:false});c.addEventListener("contextmenu",e=>e.preventDefault());window.addEventListener("resize",resize)}
-function animate(){requestAnimationFrame(animate);if(!renderer)return;for(const g of targets){if(g.userData.action){g.rotation.y=Math.sin(performance.now()*.0004+g.position.x)*.002}}renderer.render(scene,camera)}
-window.addEventListener("load",init);
-})();
+(()=>{let renderer,scene,camera,raycaster,mouse;const targets=[];const focus=new THREE.Vector3(0,0,0);let dragging=false,moved=false,lastX=0,lastY=0,zoom=30;
+const mat=(c,r=.75,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const mesh=(geo,p,c,r=.75,m=0)=>{const o=new THREE.Mesh(geo,mat(c,r,m));o.position.set(...p);o.castShadow=o.receiveShadow=true;return o};
+function box(s,p,c,r=.75,m=0){return mesh(new THREE.BoxGeometry(...s),p,c,r,m)}
+function cyl(rad,h,p,c,seg=12){return mesh(new THREE.CylinderGeometry(rad,rad,h,seg),p,c)}
+function textSprite(txt,sub,color=0x1b8fbd){const cv=document.createElement("canvas");cv.width=700;cv.height=170;const x=cv.getContext("2d");x.clearRect(0,0,700,170);x.fillStyle="rgba(3,13,19,.92)";x.beginPath();x.roundRect(12,18,676,132,18);x.fill();x.strokeStyle="#8bd4e8";x.lineWidth=5;x.stroke();x.fillStyle="#eafcff";x.font="bold 44px Tahoma";x.textAlign="center";x.fillText(txt,350,73);x.fillStyle="#9bd8e7";x.font="bold 22px Tahoma";x.fillText(sub,350,112);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(5.7,1.38,1);return s}
+function building(name,action,x,z,w,h,d,base,accent,sub){const g=new THREE.Group();g.position.set(x,0,z);g.userData={action,name};g.add(box([w+.9,.35,d+.9],[0,.18,0],0x222a2d));g.add(box([w,.35,d],[0,.38,0],accent));g.add(box([w,h,d],[0,h/2+.42,0],base));
+for(let y=1.2;y<h;y+=1.15){g.add(box([w+.16,.12,d+.16],[0,y+.42,0],accent));}
+for(let xx=-w/2+1;xx<w/2;xx+=1.25){for(let y=1.05;y<h-.25;y+=1.2){g.add(box([.52,.48,.06],[xx,y+.42,d/2+.035],0x8ed4df,.25,.1));}}
+const roof=mesh(new THREE.CylinderGeometry(Math.min(w,d)*.72,Math.min(w,d)*.82,.42,4),[0,h+.7,0],accent);roof.rotation.y=Math.PI/4;g.add(roof);
+const door=box([1.2,1.9,.12],[0,1.32,d/2+.08],0x16262c,.25,.15);g.add(door);
+const sign=textSprite(name,sub);sign.position.set(0,h+3.0,0);g.add(sign);
+targets.push(g);scene.add(g);return g}
+function palm(x,z){const g=new THREE.Group();g.position.set(x,0,z);g.add(cyl(.16,2.5,[0,1.25,0],0x68462f,8));const crown=new THREE.Group();for(let i=0;i<7;i++){const leaf=box([.12,.12,2.2],[0,0,1.0],0x286b48);leaf.rotation.y=i*Math.PI*2/7;leaf.rotation.x=.55;leaf.position.y=2.5;crown.add(leaf)}g.add(crown);scene.add(g)}
+function tree(x,z){const g=new THREE.Group();g.position.set(x,0,z);g.add(cyl(.18,1.5,[0,.75,0],0x5a3b29,8));g.add(mesh(new THREE.IcosahedronGeometry(.9,1),[0,1.9,0],0x2d6a43));scene.add(g)}
+function car(x,z,r=0,c=0x3d93b6){const g=new THREE.Group();g.position.set(x,.38,z);g.rotation.y=r;g.add(box([2.2,.45,1.05],[0,0,0],c,.5,.15));g.add(box([1.1,.4,.85],[0,.38,0],0x263b43,.3,.1));for(const a of[-.75,.75])for(const b of[-.45,.45]){const w=cyl(.2,.16,[a,-.24,b],0x11161a,12);w.rotation.z=Math.PI/2;g.add(w)}scene.add(g)}
+function road(x,z,w,d,r=0){const s=box([w,.12,d],[x,.03,z],0x292f33,.95);s.rotation.y=r;scene.add(s);const edge=box([w,.04,.09],[x,.11,-d*.38],0xb1b4a3);edge.rotation.y=r;scene.add(edge);const line=box([w*.96,.025,.11],[x,.11,0],0xd4bd55);line.rotation.y=r;scene.add(line)}
+function lamp(x,z,r=0){const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=r;g.add(box([.12,2.8,.12],[0,1.4,0],0x26383d));g.add(cyl(.23,.1,[0,2.85,0],0xf4df9a,12));scene.add(g)}
+function init(){const c=document.getElementById("city3d");scene=new THREE.Scene();scene.background=new THREE.Color(0x789da6);scene.fog=new THREE.Fog(0x789da6,48,105);camera=new THREE.OrthographicCamera(-18,18,11,-11,.1,180);camera.position.set(28,28,28);camera.lookAt(focus);
+renderer=new THREE.WebGLRenderer({canvas:c,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(c.clientWidth,c.clientHeight,false);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+scene.add(new THREE.HemisphereLight(0xd7f1ff,0x273221,2.0));const sun=new THREE.DirectionalLight(0xffdfaa,3.1);sun.position.set(-25,45,18);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+scene.add(box([100,.3,82],[0,-.22,0],0x687854));
+road(0,0,95,8,0);road(0,0,8,82,0);road(0,-18,95,7,0);road(-25,0,7,82,0);road(25,0,7,82,0);
+building("مركز المهمات","missions",-14,-10,7,4.6,6,0x394d56,0xd4aa4a,"معارك • عقود");
+building("مركز التدريب","training",-2,-10,7,4.1,6,0x355a4c,0x65c79a,"قوة • دفاع • سرعة");
+building("مركز التسوق","market",14,-10,8,4.8,7,0x42536a,0x58c5df,"معدات • تطويرات");
+building("سوق التجارة","trade",-15,11,8,4.3,7,0x5b4736,0xe0b85d,"شراء • بيع • سفر");
+building("مقر العصابة","base",0,11,9,5.4,8,0x473942,0xc96868,"المقر الرئيسي");
+building("ملفي","profile",15,11,7,3.8,6,0x48565b,0xb9d3da,"الإحصاءات");
+building("مركز المدينة","none",0,27,7,7.5,7,0x394a55,0x78a9b8,"منطقة مركزية");
+for(const [x,z] of[[-31,-14],[-30,4],[-30,22],[-23,29],[-10,31],[10,31],[27,25],[31,8],[31,-10],[25,-27],[8,-28],[-10,-29]])palm(x,z);
+for(const [x,z] of[[-21,-3],[21,-3],[-22,18],[22,18],[-9,22],[8,-21]])tree(x,z);
+for(const [x,z,r] of[[-22,0,0],[10,0,0],[28,0,0],[-8,-18,0],[8,18,Math.PI],[-18,18,Math.PI]])car(x,z,r,0x3b91b4);
+for(const [x,z] of[[-20,-4],[-7,-4],[7,-4],[20,-4],[-20,16],[-7,16],[7,16],[20,16]])lamp(x,z);
+events(c);applyCamera();animate()}
+function resize(){const c=document.getElementById("city3d");const a=c.clientWidth/c.clientHeight;const v=18;camera.left=-v;camera.right=v;camera.top=v/a;camera.bottom=-v/a;camera.updateProjectionMatrix();renderer.setSize(c.clientWidth,c.clientHeight,false)}
+function applyCamera(){const a=new THREE.Vector3(28,28,28).normalize().multiplyScalar(zoom);camera.position.copy(focus).add(a);camera.lookAt(focus)}
+function clamp(){focus.x=Math.max(-32,Math.min(32,focus.x));focus.z=Math.max(-30,Math.min(30,focus.z))}
+function events(c){c.addEventListener("pointerdown",e=>{dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;c.setPointerCapture(e.pointerId)});
+c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;if(dragging){const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;focus.x-=dx*.045;focus.z+=dy*.045;clamp();applyCamera()}lastX=e.clientX;lastY=e.clientY;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.name))g=g.parent;const h=document.getElementById("buildingHint");if(g&&g.userData.action!=="none"){h.textContent=g.userData.name+"  •  اضغط للدخول";h.classList.add("show")}else h.classList.remove("show")});
+c.addEventListener("pointerup",e=>{dragging=false;if(moved)return;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(targets,true);let g=hits.length?hits[0].object:null;while(g&&(!g.userData||!g.userData.action))g=g.parent;if(g&&g.userData.action!=="none"&&typeof act==="function")act(g.userData.action)});
+c.addEventListener("wheel",e=>{zoom=Math.max(23,Math.min(43,zoom+e.deltaY*.018));applyCamera();e.preventDefault()},{passive:false});c.addEventListener("contextmenu",e=>e.preventDefault());window.addEventListener("resize",resize)}
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}
+window.addEventListener("load",init)})();
