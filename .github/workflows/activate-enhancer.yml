@@ -1,1 +1,22 @@
-name: Validate game files\non:\n  push:\n    branches: [main]\npermissions:\n  contents: read\njobs:\n  validate:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Validate JavaScript\n        run: node --check game-enhancer.js && node --check game-enhancer-ui.js\n      - name: Check script loading\n        run: python - <<'PY'\nfrom pathlib import Path\ns=Path('index.html').read_text(encoding='utf-8')\nassert s.count('src="game-enhancer.js"')==1\nassert s.count('src="game-enhancer-ui.js"')==1\nprint('script loading OK')\nPY\n
+name: Validate game
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate inline game scripts
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const h=fs.readFileSync('index.html','utf8');
+          const scripts=[...h.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)].map(m=>m[1]);
+          if(scripts.length<2) throw new Error('Expected inline game scripts');
+          for(let i=0;i<scripts.length;i++) new Function(scripts[i]);
+          if((h.match(/game-enhancer\\.js/gi)||[]).length) throw new Error('External game-enhancer.js reference remains');
+          if((h.match(/game-enhancer-ui\\.js/gi)||[]).length) throw new Error('External game-enhancer-ui.js reference remains');
+          console.log('Inline scripts OK');
+          NODE
