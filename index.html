@@ -593,6 +593,28 @@
   .toast.show{ opacity:1; transform:translate(-50%, 0); }
   .toast-warn{ border-color:rgba(193,68,60,.5); }
   .toast-good{ border-color:rgba(79,168,160,.5); }
+
+  .visual-concept{
+    margin:0 18px 16px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    overflow:hidden;
+    background:var(--surface);
+    box-shadow:0 12px 30px rgba(0,0,0,.28);
+  }
+  .visual-concept img{
+    display:block;
+    width:100%;
+    aspect-ratio:16/9;
+    object-fit:cover;
+  }
+  .visual-caption{
+    padding:9px 12px;
+    font-size:11px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+
 </style>
 </head>
 <body>
@@ -615,6 +637,11 @@
       <h1 id="cityName">وسط المدينة</h1>
       <p>تدير عصابتك وتبني نفوذك في المدينة، حيّ بعد حيّ.</p>
     </div>
+  </section>
+
+  <section class="visual-concept" aria-label="تصميم اللعبة">
+    <img src="assets/game-ui-concept.webp" alt="تصميم بصري للعبة عصابات الشوارع" loading="eager">
+    <div class="visual-caption">التصميم البصري الجديد للعبة — القتال، المطار، المدن والمرافق</div>
   </section>
 
   <section class="meters">
