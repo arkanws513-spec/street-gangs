@@ -1,0 +1,2 @@
+export const WORLD={width:3200,height:2200,padding:48};
+export const LOCATIONS=[{id:"base",name:"المقر",x:520,y:430,color:0xd9a441},{id:"market",name:"السوق",x:1120,y:430,color:0x4fa8a0},{id:"training",name:"مركز التدريب",x:520,y:1120,color:0x9b78d0},{id:"arena",name:"الحلبة",x:1120,y:1120,color:0xc96b61},{id:"airport",name:"المطار",x:1720,y:430,color:0x6c9bd2}];
