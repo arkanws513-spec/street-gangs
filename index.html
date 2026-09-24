@@ -908,7 +908,9 @@ function battle(l,kind){
   const enemyPower=Math.round(E(l)*missionCfg.mult);
   const enemy={power:enemyPower,defense:Math.round(enemyPower*.55),speed:Math.round(enemyPower*.4),accuracy:Math.round(enemyPower*.35)};
   const player={power:B(s.level)+s.stats.power,defense:10+s.stats.defense,speed:s.stats.speed,accuracy:8+s.stats.accuracy};
-  let ph=100,eh=100,stamina=100,guard=false,over=false,round=1,turn='player',busy=false;
+  const playerMaxHp=Math.max(80,Math.round(player.power*4+player.defense*3));
+  const enemyMaxHp=Math.max(90,Math.round(enemy.power*4+enemy.defense*3));
+  let ph=playerMaxHp,eh=enemyMaxHp,stamina=100,guard=false,over=false,round=1,turn='player',busy=false;
 
   const gear=[
     ['kit','🔫'],['shield','🛡️'],['boots','🥾'],['helmet','🪖']
@@ -924,8 +926,8 @@ function battle(l,kind){
       +'<div class="pro-avatar">'+(isEnemy?'🥷':'👤')+'</div>'
       +'<div class="pro-name">'+(isEnemy?'الخصم':'مقاتلك')+'</div>'
       +'<div class="pro-level">المستوى '+(isEnemy?l:s.level)+'</div>'
-      +'<div class="pro-hp"><i id="'+(isEnemy?'ehp':'php')+'" style="width:'+hp+'%"></i></div>'
-      +'<div class="pro-hp-label"><span>الصحة</span><b id="'+(isEnemy?'ehpv':'phpv')+'">'+Math.round(hp)+'/100</b></div>'
+      +'<div class="pro-hp"><i id="'+(isEnemy?'ehp':'php')+'" style="width:'+Math.round(hp/maxHp*100)+'%"></i></div>'
+      +'<div class="pro-hp-label"><span>الصحة</span><b id="'+(isEnemy?'ehpv':'phpv')+'">'+Math.round(hp)+'/'+maxHp+'</b></div>'
       +'<div class="pro-stats">'
       +'<span class="pro-stat">💪 '+x.power+'</span><span class="pro-stat">🛡️ '+x.defense+'</span>'
       +'<span class="pro-stat">⚡ '+x.speed+'</span><span class="pro-stat">🎯 '+x.accuracy+'</span>'
@@ -967,10 +969,10 @@ function battle(l,kind){
 
   function update(){
     const php=q('php'),ehp=q('ehp');
-    if(php)php.style.width=clamp(ph)+'%';
-    if(ehp)ehp.style.width=clamp(eh)+'%';
-    if(q('phpv'))q('phpv').textContent=Math.round(ph)+'/100';
-    if(q('ehpv'))q('ehpv').textContent=Math.round(eh)+'/100';
+    if(php)php.style.width=clamp(ph/playerMaxHp*100)+'%';
+    if(ehp)ehp.style.width=clamp(eh/enemyMaxHp*100)+'%';
+    if(q('phpv'))q('phpv').textContent=Math.round(ph)+'/'+playerMaxHp;
+    if(q('ehpv'))q('ehpv').textContent=Math.round(eh)+'/'+enemyMaxHp;
     if(q('stv'))q('stv').textContent=stamina+' / 100';
     if(q('stf'))q('stf').style.width=stamina+'%';
   }
@@ -1002,7 +1004,7 @@ function battle(l,kind){
   function playerAction(){
     if(over||busy||turn!=='player')return;
     busy=true;
-    const dmg=Math.max(1,Math.round(player.power*(.72+Math.random()*.28)-enemy.defense*.28));
+    const dmg=Math.max(1,Math.round(player.power*(.42+Math.random()*.18)-enemy.defense*.10));
     eh=clamp(eh-dmg); animate('playerF','enemyF');
     message('هجومك • '+dmg+' ضرر');
     log('⚔️ هاجمت الخصم وسببت <b>'+dmg+'</b> ضرر.');
@@ -1020,7 +1022,7 @@ function battle(l,kind){
     }else{
       const hitChance=Math.min(.93,.62+enemy.accuracy*.006);
       if(Math.random()<=hitChance){
-        dmg=Math.max(1,Math.round(enemy.power*(.55+Math.random()*.25)-player.defense*(guard?.55:.3)));
+        dmg=Math.max(1,Math.round(enemy.power*(.34+Math.random()*.16)-player.defense*(guard?.55:.18)));
         ph=clamp(ph-dmg);animate('enemyF','playerF');
         message('الخصم هاجمك • '+dmg+' ضرر');
         log('👊 الخصم هاجمك وسبب <b>'+dmg+'</b> ضرر.');
