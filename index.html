@@ -247,8 +247,7 @@
   .sheet-header h2{ margin:0; font-size:17px; font-weight:800; }
   .sheet-header button{
     width:30px; height:30px;
-    border-radius:50%;
-    border:1px solid var(--border);
+    border-radius:50%;    border:1px solid var(--border);
     background:var(--surface);
     color:var(--text-dim);
     font-size:16px;
@@ -497,8 +496,7 @@
     margin-top:8px;
   }
   .hp-fill{
-    height:100%;
-    width:100%;
+    height:100%;    width:100%;
     background:var(--good);
     border-radius:999px;
     transition:width .3s ease;
@@ -622,7 +620,36 @@
 .studio-card b{display:block;font-size:15px;margin-bottom:5px}.studio-card span{font-size:12px;opacity:.72}
 .studio-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#202630;font-size:11px;margin-bottom:8px}
 .studio-progress{height:7px;background:#242a32;border-radius:99px;overflow:hidden;margin-top:9px}.studio-progress i{display:block;height:100%;width:68%;background:linear-gradient(90deg,#6ee7b7,#60a5fa)}
-</style></head>
+<style id="major-ui-upgrade">
+/* Major Street Gangs UI — command center */
+.command-center{margin:0 18px 16px;border:1px solid #343a43;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,#181c22,#101216);box-shadow:0 18px 40px rgba(0,0,0,.3)}
+.command-head{display:flex;justify-content:space-between;align-items:center;padding:15px 15px 11px;border-bottom:1px solid #292f37}
+.command-head b{font-size:15px}.command-head small{color:var(--text-dim);font-size:10.5px}
+.command-live{display:flex;align-items:center;gap:6px;font-size:10px;color:#7ee0b5}
+.command-live i{width:7px;height:7px;border-radius:50%;background:#7ee0b5;box-shadow:0 0 10px rgba(126,224,181,.7)}
+.city-map{position:relative;height:205px;background:
+linear-gradient(25deg,transparent 45%,rgba(217,164,65,.13) 46%,rgba(217,164,65,.13) 48%,transparent 49%),
+linear-gradient(155deg,transparent 39%,rgba(104,151,190,.12) 40%,rgba(104,151,190,.12) 43%,transparent 44%),
+linear-gradient(90deg,transparent 47%,rgba(255,255,255,.06) 48%,rgba(255,255,255,.06) 50%,transparent 51%),
+radial-gradient(circle at 50% 45%,#29313a 0,#171b20 55%,#101216 100%);
+overflow:hidden}
+.city-map:before{content:"";position:absolute;inset:22px 28px;border:1px dashed rgba(217,164,65,.22);border-radius:45% 55% 50% 40%;transform:rotate(-8deg)}
+.map-road{position:absolute;background:rgba(210,215,220,.08);height:9px;border-radius:99px;transform-origin:left center}
+.map-road.r1{width:270px;left:-20px;top:80px;transform:rotate(17deg)}.map-road.r2{width:300px;left:105px;top:138px;transform:rotate(-19deg)}.map-road.r3{width:220px;left:170px;top:25px;transform:rotate(72deg)}
+.map-node{position:absolute;z-index:2;width:66px;height:66px;border-radius:18px;background:rgba(25,29,35,.94);border:1px solid #424953;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.28);cursor:pointer}
+.map-node b{font-size:22px;line-height:1}.map-node span{font-size:9px;color:var(--text-dim);margin-top:4px}
+.map-node.main{left:calc(50% - 33px);top:69px;border-color:var(--accent);box-shadow:0 0 0 4px rgba(217,164,65,.08),0 12px 25px rgba(0,0,0,.3)}
+.map-node.n1{left:24px;top:27px}.map-node.n2{right:24px;top:25px}.map-node.n3{left:38px;bottom:16px}.map-node.n4{right:35px;bottom:13px}
+.command-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px}
+.quick{border:1px solid #303640;background:#1c2128;border-radius:13px;padding:10px 5px;color:var(--text);cursor:pointer;text-align:center}
+.quick:active{transform:scale(.96)}.quick b{display:block;font-size:18px}.quick span{font-size:9px;color:var(--text-dim)}
+.mission-focus{margin:0 18px 16px;border:1px solid #3b3427;border-radius:18px;padding:14px;background:linear-gradient(145deg,#211d16,#151413)}
+.mission-focus-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.mission-focus-head b{font-size:14px}.mission-focus-head span{font-size:10px;color:var(--accent-strong);border:1px solid rgba(217,164,65,.35);padding:4px 8px;border-radius:99px}
+.mission-line{height:8px;background:#27231d;border-radius:99px;overflow:hidden}.mission-line i{display:block;width:2%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-strong))}
+.mission-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:10.5px;color:var(--text-dim)}
+@media(max-width:360px){.command-actions{grid-template-columns:repeat(2,1fr)}}
+</style></style></head>
 <body>
 <div class="app">
 
@@ -631,7 +658,7 @@
       <div class="brand-mark">♠</div>
       <div class="brand-text">
         <strong>عصابات الشوارع</strong>
-        <span>زعيم المدينة</span>
+        <span>مركز قيادة العصابة</span>
       </div>
     </div>
     <div class="cash-pill"><span class="cash-icon">💵</span><b id="cash">0</b></div>
@@ -641,13 +668,35 @@
     <div class="hero-badge"><b id="levelBadge">1</b></div>
     <div class="hero-content">
       <h1 id="cityName">وسط المدينة</h1>
-      <p>تدير عصابتك وتبني نفوذك في المدينة، حيّ بعد حيّ.</p>
+      <p>ابنِ نفوذك، جهّز مقاتلك، وأنجز المهام لفتح طريقك نحو المستوى 50.</p>
     </div>
   </section>
 
+<section class="command-center">
+  <div class="command-head"><div><b>خريطة النفوذ</b><small> سيطر على مناطق المدينة ووسّع عصابتك</small></div><div class="command-live"><i></i> مباشر</div></div>
+  <div class="city-map">
+    <div class="map-road r1"></div><div class="map-road r2"></div><div class="map-road r3"></div>
+    <button class="map-node n1" data-action="open-missions"><b>⚔️</b><span>الحلبة</span></button>
+    <button class="map-node n2" data-action="open-market"><b>🛒</b><span>السوق</span></button>
+    <button class="map-node main" data-action="open-base"><b>♠</b><span>المقر</span></button>
+    <button class="map-node n3" data-action="open-training"><b>🏋️</b><span>التدريب</span></button>
+    <button class="map-node n4" data-action="open-airport"><b>✈️</b><span>المطار</span></button>
+  </div>
+  <div class="command-actions">
+    <button class="quick" data-action="open-missions"><b>⚔️</b><span>مهمة</span></button>
+    <button class="quick" data-action="open-training"><b>🏋️</b><span>تدريب</span></button>
+    <button class="quick" data-action="open-market"><b>🛒</b><span>معدات</span></button>
+    <button class="quick" data-action="open-city"><b>🏙️</b><span>المدينة</span></button>
+  </div>
+</section>
+<section class="mission-focus">
+  <div class="mission-focus-head"><b>🎯 المهمة الحالية</b><span>المستوى 1</span></div>
+  <div class="mission-line"><i></i></div>
+  <div class="mission-meta"><span>0 / 50 مهمة مكتملة</span><span>ابدأ أول مهمة</span></div>
+</section>
   <section class="visual-concept" aria-label="تصميم اللعبة">
     <img src="assets/game-ui-concept.webp" alt="تصميم بصري للعبة عصابات الشوارع" loading="eager">
-    <div class="visual-caption">التصميم البصري الجديد للعبة — القتال، المطار، المدن والمرافق</div>
+    <div class="visual-caption">مركز القيادة — الخريطة، المهمات، التدريب، المعدات والسفر</div>
   </section>
 
   <section class="meters">
@@ -747,8 +796,7 @@ function battle(l){
         +'</div>'
         +'<div class="staminaRow"><span>⚡ نقاط التحمل</span><b id="stv">'+stamina+' / 100</b></div>'
         +'<div class="hp"><i id="stf" style="width:'+stamina+'%"></i></div>'
-        +'<button class="btn btn-block" id="autoBtn">الهجوم التلقائي</button>'
-        +'<div class="battleFooter">'
+        +'<button class="btn btn-block" id="autoBtn">الهجوم التلقائي</button>'        +'<div class="battleFooter">'
           +'<button class="btn btn-ghost" id="retreat">🏃 الانسحاب</button>'
           +'<button class="btn btn-ghost" id="exit">🚪 خروج</button>'
         +'</div>'
