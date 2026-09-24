@@ -24,10 +24,10 @@ export class CityScene extends Phaser.Scene{
  }
  openLocation(loc){if(loc.id==="arena")this.scene.start("MissionScene");else if(loc.id==="training")this.scene.start("TrainingScene");else if(loc.id==="market")this.scene.start("EquipmentScene");else{this.cameras.main.flash(180,217,164,65);}}
  setupCameraDrag(){
-  let active=false,moved=false,sx=0,sy=0,cx=0,cy=0;
+  let active=false,moved=false,sx=0,sy=0,cx=0,cy=0;this.draggingCamera=false;
   this.input.on("pointerdown",p=>{
    if(p.y>this.scale.height-150)return;
-   active=true;moved=false;sx=p.x;sy=p.y;cx=this.cameras.main.scrollX;cy=this.cameras.main.scrollY;
+   active=true;moved=false;sx=p.x;sy=p.y;cx=this.cameras.main.scrollX;cy=this.cameras.main.scrollY;this.draggingCamera=true;
    this.cameras.main.stopFollow();
   });
   this.input.on("pointermove",p=>{
@@ -60,10 +60,11 @@ export class CityScene extends Phaser.Scene{
   const x=(this.keys.D.isDown||this.cursors.right.isDown?1:0)-(this.keys.A.isDown||this.cursors.left.isDown?1:0)+(this.joy?.x||0);
   const y=(this.keys.S.isDown||this.cursors.down.isDown?1:0)-(this.keys.W.isDown||this.cursors.up.isDown?1:0)+(this.joy?.y||0);
   if(x||y){
+   this.draggingCamera=false;
    const v=new Phaser.Math.Vector2(x,y).normalize().scale(280*dt/1000);
    this.player.x=Phaser.Math.Clamp(this.player.x+v.x,WORLD.padding,WORLD.width-WORLD.padding);
    this.player.y=Phaser.Math.Clamp(this.player.y+v.y,WORLD.padding,WORLD.height-WORLD.padding);
-   if(!this.draggingCamera)this.cameras.main.startFollow(this.player,true,.08,.08);
+   this.cameras.main.startFollow(this.player,true,.08,.08);
   }
  }
 }
