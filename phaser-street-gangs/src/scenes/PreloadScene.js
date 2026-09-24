@@ -1,1 +1,2 @@
+import * as Phaser from "https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.esm.js";
 export class PreloadScene extends Phaser.Scene{constructor(){super("PreloadScene")}create(){this.scene.start("MainMenuScene")}}
