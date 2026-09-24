@@ -1,111 +1,18 @@
-class CityScene extends Phaser.Scene {
+class CityScene extends Phaser.Scene{
   constructor(){super('CityScene');}
-
-  create(){
-    var gs=window.gameState;
-    this.add.text(this.scale.width/2,90,'وكر الأوغاد',{
-      fontFamily:'Cairo, sans-serif',fontSize:'30px',fontStyle:'bold',color:'#d4af37'
-    }).setOrigin(.5);
-
-    this.topBar=buildTopBar(this,'CityScene');
-
-    var self=this;
-    var keys=['hq','bank','warehouse','barracks'];
-    var cardW=172,cardH=190,gap=10;
-    var totalW=keys.length*cardW+(keys.length-1)*gap;
-    var startX=(this.scale.width-totalW)/2;
-    var y=140;
-
-    this.cards={};
-    keys.forEach(function(key,i){
-      var x=startX+i*(cardW+gap);
-      self.cards[key]=self.buildBuildingCard(key,x,y,cardW,cardH);
-    });
-
-    this.logPanel=buildLogPanel(this,startX,y+cardH+25,totalW,115);
-    this.events.on('update',this.refresh,this);
-    this.refresh();
+  init(data){this.city=(data&&data.city)||window.gameState.location||'main';this.chooseCity=data&&data.chooseCity;}
+  create(){this.render();}
+  render(){this.children.removeAll(true);var s=this,gs=window.gameState,city=CITIES[this.city]||CITIES.main;
+    header(this,city.name,'home');
+    if(this.city==='main')this.renderMain(city);else this.renderCity(city);
   }
-
-  buildBuildingCard(key,x,y,w,h){
-    var cfg=BUILDINGS[key],gs=window.gameState;
-    drawPanel(this,x,y,w,h,COLORS.panel,COLORS.border);
-
-    var icon=this.add.graphics();
-    icon.fillStyle(cfg.color,1);
-    icon.fillRoundedRect(x+w/2-24,y+14,48,48,8);
-
-    this.add.text(x+w/2,y+78,cfg.name,{
-      fontFamily:'Cairo, sans-serif',fontSize:'17px',fontStyle:'bold',color:'#fff',
-      align:'center'
-    }).setOrigin(.5);
-
-    var levelText=this.add.text(x+w/2,y+103,'',{
-      fontFamily:'Cairo, sans-serif',fontSize:'13px',color:COLORS.textMuted
-    }).setOrigin(.5);
-
-    var infoText=this.add.text(x+w/2,y+125,'',{
-      fontFamily:'Cairo, sans-serif',fontSize:'12px',color:COLORS.textMuted,
-      align:'center',wordWrap:{width:w-20}
-    }).setOrigin(.5);
-
-    var self=this;
-    var btn=makeButton(this,x+10,y+h-43,w-20,32,'ترقية',COLORS.gold,function(){
-      var res=gs.startUpgrade(key);
-      if(!res.ok) self.flashMessage(res.reason);
-    });
-
-    return {icon:icon,levelText:levelText,infoText:infoText,btn:btn};
+  card(dest,x,y,w,h){var s=this,locked=dest.kind==='locked'||dest.kind==='palace';panel(s,x,y,w,h,locked?0x141923:COLORS.panel2);txt(s,x+w/2,y+34,dest.emoji,30);txt(s,x+w/2,y+75,dest.name,16,locked?'#c1c6d0':COLORS.text);txt(s,x+w/2,y+105,dest.desc,11,COLORS.muted);
+    button(s,x+18,y+h-42,w-36,30,locked?(dest.status||'غير متاح'): 'دخول',locked?0x4b5260:COLORS.gold,function(){if(locked)s.scene.start('LocationScene',{city:s.city,kind:dest.kind,name:dest.name,status:dest.status});else s.scene.start('LocationScene',{city:s.city,kind:dest.kind,name:dest.name});});
   }
-
-  flashMessage(text){
-    if(this._msg)this._msg.destroy();
-    this._msg=this.add.text(this.scale.width/2,this.scale.height-18,text,{
-      fontFamily:'Cairo, sans-serif',fontSize:'15px',color:'#ff6b6b',
-      backgroundColor:'#181c26',padding:{x:10,y:5}
-    }).setOrigin(.5);
-
-    var self=this;
-    this.time.delayedCall(1800,function(){
-      if(self._msg){self._msg.destroy();self._msg=null;}
-    });
+  renderMain(){var list=CITY_DESTINATIONS.main;txt(this,400,128,'وجهات المدينة',18,COLORS.text);var w=178,h=128,g=12,start=31;list.forEach((d,i)=>{var col=i%4,row=Math.floor(i/4);this.card(d,start+col*(w+g),150+row*(h+g),w,h);});
+    panel(this,31,444,738,132,COLORS.panel);txt(this,400,470,'تقدم اللاعب',15,COLORS.muted);txt(this,400,500,'المستوى '+window.gameState.progress.level+'   •   XP '+window.gameState.progress.xp+' / '+window.gameState.progress.nextXp+'   •   نقاط التحمل '+window.gameState.progress.stamina,15,COLORS.text);progress(this,100,538,600,10,window.gameState.progress.xp/window.gameState.progress.nextXp,COLORS.gold);
   }
-
-  refresh(){
-    var gs=window.gameState;
-    this.topBar.refresh();
-    this.logPanel.refresh();
-
-    var self=this;
-    Object.keys(this.cards).forEach(function(key){
-      var card=self.cards[key],b=gs.buildings[key],maxLevel=gs.getBuildingMaxLevel(key);
-      card.levelText.setText('المستوى '+b.level+' / '+maxLevel);
-
-      var extra='';
-      if(key==='bank')extra='+'+gs.bankIncomePerSec()+' 💵/ث';
-      else if(key==='warehouse')extra='السعة: '+formatNumber(gs.warehouseCapacity());
-      else if(key==='barracks')extra='تسريع التدريب '+Math.round((1-gs.trainSpeedMultiplier())*100)+'%';
-      else if(key==='hq')extra='يرفع سقف باقي المباني';
-      card.infoText.setText(extra);
-
-      var busyTimer=gs.timers.filter(function(t){
-        return t.kind==='building'&&t.key===key;
-      })[0];
-
-      if(busyTimer){
-        var remaining=(busyTimer.completeAt-Date.now())/1000;
-        card.btn.setLabel('جارٍ... '+formatTime(remaining));
-        card.btn.setEnabled(false);
-      }else{
-        var check=gs.canUpgradeBuilding(key);
-        if(check.ok){
-          card.btn.setLabel('ترقية ('+formatNumber(check.cost)+' 💵)');
-          card.btn.setEnabled(true);
-        }else{
-          card.btn.setLabel(check.reason);
-          card.btn.setEnabled(false);
-        }
-      }
-    });
+  renderCity(city){txt(this,400,128,city.emoji+'  '+city.name,20,COLORS.text);var list=CITY_DESTINATIONS.city,w=230,h=130,g=14,start=30;list.forEach((d,i)=>{var col=i%3,row=Math.floor(i/3);this.card(d,start+col*(w+g),150+row*(h+g),w,h);});
+    panel(this,30,452,740,112,COLORS.panel);txt(this,400,478,'السفر الحالي',15,COLORS.muted);txt(this,400,508,'وصلت من: '+(CITIES[window.gameState.lastCity]||CITIES.main).name,14,COLORS.text);button(this,550,526,190,30,'العودة للمدينة الرئيسية',COLORS.panel2,function(){window.gameState.travel('main');this.scene.start('CityScene',{city:'main'});}.bind(this));
   }
 }
