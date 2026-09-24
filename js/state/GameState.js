@@ -1,32 +1,58 @@
-function GameState() {
-  this.resources = Object.assign({}, GAME_CONFIG.startingResources);
-  this.buildings = {hq:{level:1},bank:{level:1},warehouse:{level:1},barracks:{level:1}};
-  this.crew = {bulker:0,biker:0,shooter:0};
-  this.timers = [];
-  this.log = [];
-  this._energyAccumulator = 0;
-  this._nextId = 1;
+function GameState(){
+  this.resources=Object.assign({},GAME_CONFIG.startingResources);
+  this.progress=Object.assign({},GAME_CONFIG.startingProgress);
+  this.stats=Object.assign({},GAME_CONFIG.startingStats);
+  this.location='main'; this.lastCity='main'; this.currentArenaLevel=1;
+  this.completedMissions=[]; this.timers=[]; this.log=[]; this._energyAccumulator=0;
 }
-GameState.prototype.load=function(){try{var raw=localStorage.getItem(GAME_CONFIG.saveKey);if(!raw)return;var data=JSON.parse(raw);this.resources=Object.assign({},GAME_CONFIG.startingResources,data.resources||{});this.buildings=Object.assign({hq:{level:1},bank:{level:1},warehouse:{level:1},barracks:{level:1}},data.buildings||{});this.crew=Object.assign({bulker:0,biker:0,shooter:0},data.crew||{});this.timers=data.timers||[];this.log=data.log||[];this._nextId=data._nextId||1;}catch(e){console.warn('تعذر تحميل الحفظ، بدأنا لعبة جديدة.',e);}};
-GameState.prototype.save=function(){var data={resources:this.resources,buildings:this.buildings,crew:this.crew,timers:this.timers,log:this.log.slice(-30),_nextId:this._nextId};try{localStorage.setItem(GAME_CONFIG.saveKey,JSON.stringify(data));}catch(e){console.warn('تعذر حفظ اللعبة',e);}};
-GameState.prototype.resetSave=function(){localStorage.removeItem(GAME_CONFIG.saveKey);GameState.call(this);};
-GameState.prototype.addLog=function(text){this.log.push({text:text,at:Date.now()});if(this.log.length>50)this.log.shift();};
-GameState.prototype.getBuildingMaxLevel=function(key){if(key==='hq')return BUILDINGS.hq.maxLevel;return this.buildings.hq.level;};
-GameState.prototype.getUpgradeCost=function(key){var cfg=BUILDINGS[key],level=this.buildings[key].level;return Math.round(cfg.baseCost*Math.pow(cfg.costGrowth,level-1));};
-GameState.prototype.getUpgradeTime=function(key){var cfg=BUILDINGS[key],level=this.buildings[key].level;return Math.round(cfg.baseTime*Math.pow(cfg.timeGrowth,level-1));};
-GameState.prototype.isBuildingBusy=function(key){return this.timers.some(function(t){return t.kind==='building'&&t.key===key;});};
-GameState.prototype.canUpgradeBuilding=function(key){if(this.isBuildingBusy(key))return{ok:false,reason:'قيد الترقية بالفعل'};var level=this.buildings[key].level,maxLevel=this.getBuildingMaxLevel(key);if(key!=='hq'&&level>=maxLevel)return{ok:false,reason:'يجب ترقية المقر الرئيسي أولاً'};if(key==='hq'&&level>=maxLevel)return{ok:false,reason:'وصلت لأعلى مستوى'};var cost=this.getUpgradeCost(key);if(this.resources.cash<cost)return{ok:false,reason:'المال غير كافٍ'};return{ok:true,cost:cost,time:this.getUpgradeTime(key)};};
-GameState.prototype.startUpgrade=function(key){var check=this.canUpgradeBuilding(key);if(!check.ok)return check;this.resources.cash-=check.cost;this.timers.push({id:this._nextId++,kind:'building',key:key,amount:1,completeAt:Date.now()+check.time*1000});this.save();return{ok:true};};
-GameState.prototype.bankIncomePerSec=function(){return BUILDINGS.bank.baseIncome*this.buildings.bank.level;};
-GameState.prototype.warehouseCapacity=function(){return GAME_CONFIG.startingResources.cash+BUILDINGS.warehouse.baseCapacity*this.buildings.warehouse.level;};
-GameState.prototype.trainSpeedMultiplier=function(){var lvl=this.buildings.barracks.level,reduction=Math.min(.7,BUILDINGS.barracks.trainSpeedPerLevel*(lvl-1));return 1-reduction;};
-GameState.prototype.getCrewCost=function(type,count){var cfg=CREW_TYPES[type];return{cash:cfg.cost.cash*count,manpower:cfg.cost.manpower*count};};
-GameState.prototype.canTrainCrew=function(type,count){var cost=this.getCrewCost(type,count);if(this.resources.cash<cost.cash)return{ok:false,reason:'المال غير كافٍ'};if(this.resources.manpower<cost.manpower)return{ok:false,reason:'الأفراد المتاحون غير كافين'};return{ok:true,cost:cost};};
-GameState.prototype.startTraining=function(type,count){var check=this.canTrainCrew(type,count);if(!check.ok)return check;this.resources.cash-=check.cost.cash;this.resources.manpower-=check.cost.manpower;var time=Math.round(CREW_TYPES[type].trainTime*count*this.trainSpeedMultiplier());this.timers.push({id:this._nextId++,kind:'crew',key:type,amount:count,completeAt:Date.now()+time*1000});this.save();return{ok:true};};
-GameState.prototype.totalCrewPower=function(){var self=this;return Object.keys(this.crew).reduce(function(sum,type){return sum+self.crew[type]*CREW_TYPES[type].power;},0);};
-GameState.prototype.totalCrewCount=function(){var self=this;return Object.keys(this.crew).reduce(function(sum,type){return sum+self.crew[type];},0);};
-GameState.prototype.processTimers=function(){var now=Date.now(),self=this,completed=[];this.timers=this.timers.filter(function(t){if(t.completeAt<=now){completed.push(t);return false;}return true;});completed.forEach(function(t){if(t.kind==='building'){self.buildings[t.key].level+=t.amount;self.addLog('اكتملت ترقية '+BUILDINGS[t.key].name+' إلى المستوى '+self.buildings[t.key].level);}else if(t.kind==='crew'){self.crew[t.key]+=t.amount;self.addLog('انضم '+t.amount+' من ('+CREW_TYPES[t.key].name+') إلى العصابة');}});if(completed.length)this.save();return completed;};
-GameState.prototype.tick=function(dtSeconds){var income=this.bankIncomePerSec()*dtSeconds;this.resources.cash=Math.min(this.resources.cash+income,this.warehouseCapacity());this._energyAccumulator+=dtSeconds;var regenEvery=GAME_CONFIG.energyRegenSeconds;while(this._energyAccumulator>=regenEvery){this._energyAccumulator-=regenEvery;if(this.resources.energy<this.resources.maxEnergy)this.resources.energy+=1;}this.processTimers();};
-GameState.prototype.attemptMission=function(missionId){var mission=MISSIONS.filter(function(m){return m.id===missionId;})[0];if(!mission)return{ok:false,reason:'مهمة غير معروفة'};if(this.resources.energy<mission.energy)return{ok:false,reason:'الطاقة غير كافية'};this.resources.energy-=mission.energy;var power=this.totalCrewPower(),ratio=power/mission.power,successChance=Math.max(.05,Math.min(.95,ratio)),success=Math.random()<successChance,result={ok:true,success:success,mission:mission};if(success){this.resources.cash=Math.min(this.resources.cash+mission.reward.cash,this.warehouseCapacity());this.resources.manpower+=mission.reward.manpower;this.addLog('نجحت مهمة "'+mission.name+'" وربحت '+mission.reward.cash+' 💵');result.reward=mission.reward;}else{var penalty=Math.round(mission.reward.cash*.15);this.resources.cash=Math.max(0,this.resources.cash-penalty);this.addLog('فشلت مهمة "'+mission.name+'" وخسرت '+penalty+' 💵');result.penalty=penalty;}this.save();return result;};
-GameState.prototype.generateRivals=function(count){var myPower=Math.max(10,this.totalCrewPower()),rivals=[];for(var i=0;i<count;i++){var variance=.6+Math.random()*.8,power=Math.round(myPower*variance),loot=Math.round(200+power*(3+Math.random()*4));rivals.push({id:'r'+i+'_'+Date.now(),name:RIVAL_NAMES[Math.floor(Math.random()*RIVAL_NAMES.length)],power:power,loot:loot});}return rivals;};
-GameState.prototype.attackRival=function(rival){if(this.resources.energy<GAME_CONFIG.attackEnergyCost)return{ok:false,reason:'الطاقة غير كافية'};this.resources.energy-=GAME_CONFIG.attackEnergyCost;var myPower=this.totalCrewPower(),successChance=Math.max(.05,Math.min(.9,myPower/(myPower+rival.power))),success=Math.random()<successChance,result={ok:true,success:success,rival:rival};if(success){var stolen=Math.round(rival.loot*(.4+Math.random()*.3));this.resources.cash=Math.min(this.resources.cash+stolen,this.warehouseCapacity());this.addLog('هاجمت '+rival.name+' بنجاح وسرقت '+stolen+' 💵');result.stolen=stolen;}else{var lost=Math.round(Math.min(this.resources.cash,rival.loot*.15));this.resources.cash-=lost;this.addLog('هاجمت '+rival.name+' وخسرت المواجهة (-'+lost+' 💵)');result.lost=lost;}this.save();return result;};
+GameState.prototype.load=function(){
+  try{var raw=localStorage.getItem(GAME_CONFIG.saveKey);if(!raw)return;var d=JSON.parse(raw);
+    this.resources=Object.assign({},GAME_CONFIG.startingResources,d.resources||{});
+    this.progress=Object.assign({},GAME_CONFIG.startingProgress,d.progress||{});
+    this.stats=Object.assign({},GAME_CONFIG.startingStats,d.stats||{});
+    this.location=d.location||'main';this.lastCity=d.lastCity||'main';this.currentArenaLevel=d.currentArenaLevel||1;
+    this.completedMissions=d.completedMissions||[];this.timers=d.timers||[];this.log=d.log||[];
+  }catch(e){console.warn('save load failed',e);}
+};
+GameState.prototype.save=function(){try{localStorage.setItem(GAME_CONFIG.saveKey,JSON.stringify({
+  resources:this.resources,progress:this.progress,stats:this.stats,location:this.location,lastCity:this.lastCity,
+  currentArenaLevel:this.currentArenaLevel,completedMissions:this.completedMissions,timers:this.timers,log:this.log.slice(-40)
+}));}catch(e){}};
+GameState.prototype.addLog=function(t){this.log.push({text:t,at:Date.now()});if(this.log.length>40)this.log.shift();};
+GameState.prototype.totalPower=function(){return this.stats.strength+this.stats.speed+this.stats.defense+this.stats.accuracy;};
+GameState.prototype.canTrain=function(stat){return this.progress.stamina>0&&this.stats[stat]<100;};
+GameState.prototype.upgradeStat=function(stat){
+  if(!this.canTrain(stat))return{ok:false,reason:this.progress.stamina<=0?'لا توجد نقاط تحمل':'وصل المؤشر للحد الحالي'};
+  this.progress.stamina--;this.stats[stat]++;this.addLog('تم تطوير '+stat+' باستخدام نقطة تحمل');this.save();return{ok:true};
+};
+GameState.prototype.gainXP=function(amount){
+  this.progress.xp+=amount;
+  var leveled=0;
+  while(this.progress.xp>=this.progress.nextXp){this.progress.xp-=this.progress.nextXp;this.progress.level++;this.progress.stamina+=5;this.progress.nextXp=Math.ceil(this.progress.nextXp*1.35);leveled++;}
+  return leveled;
+};
+GameState.prototype.startMission=function(id){
+  var m=MISSIONS.find(function(x){return x.id===id;});
+  if(!m)return{ok:false,reason:'المهمة غير موجودة'};
+  if(this.resources.energy<m.energy)return{ok:false,reason:'الطاقة غير كافية'};
+  this.resources.energy-=m.energy;this.save();return{ok:true,mission:m};
+};
+GameState.prototype.resolveMissionBattle=function(m,win){
+  if(win){
+    this.resources.cash+=m.reward;this.resources.reputation+=Math.max(2,m.difficulty==='صعبة جدًا'?8:4);
+    var levels=this.gainXP(m.xp);if(this.completedMissions.indexOf(m.id)<0)this.completedMissions.push(m.id);
+    this.addLog('نجحت في '+m.name+' وربحت '+m.reward+' 💵 و '+m.xp+' XP');
+    this.save();return{levels:levels};
+  }
+  this.addLog('خسرت معركة المهمة. تم خصم الطاقة عند بدء المهمة فقط.');this.save();return{levels:0};
+};
+GameState.prototype.startArena=function(){
+  var enemyPower=ARENA_BASE+(this.currentArenaLevel-1)*35;
+  return{name:'مقاتل المستوى '+this.currentArenaLevel,power:enemyPower};
+};
+GameState.prototype.resolveArena=function(win){
+  if(win){this.resources.cash+=150+this.currentArenaLevel*70;this.resources.reputation+=3;this.currentArenaLevel++;this.gainXP(45);this.addLog('انتصرت في الحلبة وتنتظرك مواجهة أقوى.');}
+  else{this.addLog('خسرت في الحلبة وتحتاج إلى العلاج.');}this.save();
+};
+GameState.prototype.travel=function(city){if(!CITIES[city]||city.indexOf('future')===0)return false;this.lastCity=this.location;this.location=city;this.save();return true;};
+GameState.prototype.tick=function(dt){this._energyAccumulator+=dt;while(this._energyAccumulator>=GAME_CONFIG.energyRegenSeconds){this._energyAccumulator-=GAME_CONFIG.energyRegenSeconds;if(this.resources.energy<this.resources.maxEnergy)this.resources.energy++;}this.save();};
