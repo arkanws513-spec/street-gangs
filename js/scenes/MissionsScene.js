@@ -18,8 +18,9 @@ class MissionsScene extends Phaser.Scene {
     var logY=484;
     this.logPanel=buildLogPanel(this,startX,logY,w,112);
 
-    this.events.on('update',this.refresh,this);
     this.refresh();
+    // لا نعيد رسم كل عناصر الواجهة في كل إطار؛ ذلك كان يسبب تجمد شاشة المهمات على الهاتف.
+    this.refreshTimer=this.time.addEvent({delay:500,loop:true,callback:this.refresh,callbackScope:this});
   }
 
   buildMissionRow(mission,x,y,w,h){
@@ -77,7 +78,8 @@ class MissionsScene extends Phaser.Scene {
       var ratio=power/row.mission.power;
       var chance=Math.round(Math.max(.05,Math.min(.95,ratio))*100);
       row.chanceText.setText('فرصة النجاح: '+chance+'%');
-      row.btn.setEnabled(gs.resources.energy>=row.mission.energy);
+      var enabled=gs.resources.energy>=row.mission.energy;
+      if(row.enabled!==enabled){ row.enabled=enabled; row.btn.setEnabled(enabled); }
     });
   }
 }
