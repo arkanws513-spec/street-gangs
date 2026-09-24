@@ -29,19 +29,19 @@
       return;
     }
 
-    var required = [
-      'GameState',
-      'CityScene',
-      'CrewScene',
-      'MissionsScene',
-      'AttackScene'
-    ];
+    // الدوال المعرّفة بـ function تصبح خصائص على window، لكن class
+    // المعرّفة في ملفات script التقليدية تبقى في النطاق العام دون window.X.
+    // لذلك نتحقق من وجود كل رمز مباشرة بدل window[اسم].
+    var missing = [];
+    if (typeof GameState === 'undefined') missing.push('GameState');
+    if (typeof CityScene === 'undefined') missing.push('CityScene');
+    if (typeof CrewScene === 'undefined') missing.push('CrewScene');
+    if (typeof MissionsScene === 'undefined') missing.push('MissionsScene');
+    if (typeof AttackScene === 'undefined') missing.push('AttackScene');
 
-    for (var i = 0; i < required.length; i++) {
-      if (typeof window[required[i]] === 'undefined') {
-        showFatalError('الملف المطلوب لم يتم تحميله: ' + required[i]);
-        return;
-      }
+    if (missing.length) {
+      showFatalError('ملفات اللعبة لم تُحمّل بشكل صحيح: ' + missing.join('، '));
+      return;
     }
 
     try {
