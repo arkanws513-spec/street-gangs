@@ -570,6 +570,130 @@
   }
   .battle-log p:last-child{ border-bottom:none; }
 
+
+/* ===== Professional battle redesign ===== */
+.battle-pro{
+  padding-bottom:4px;
+}
+.battle-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-bottom:10px;
+}
+.battle-round{
+  font-size:11px;font-weight:800;color:var(--text-dim);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:7px 10px;
+}
+.battle-turn{
+  flex:1;text-align:center;font-size:12px;font-weight:900;
+  color:var(--accent-strong);
+}
+.combat-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#1b1f25,#111419);
+  border:1px solid #343a43;border-radius:22px;
+  padding:12px;margin-bottom:10px;
+  box-shadow:0 16px 34px rgba(0,0,0,.28);
+}
+.combat-card::after{
+  content:"";position:absolute;inset:auto -20% -70px;
+  height:130px;background:radial-gradient(ellipse,rgba(217,164,65,.09),transparent 68%);
+  pointer-events:none;
+}
+.combatants-pro{
+  display:grid;grid-template-columns:1fr 46px 1fr;gap:7px;align-items:center;
+}
+.fighter-pro{
+  position:relative;z-index:2;text-align:center;
+  background:rgba(10,12,15,.36);border:1px solid var(--border);
+  border-radius:17px;padding:10px 7px;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.fighter-pro.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(217,164,65,.10),0 8px 22px rgba(0,0,0,.25);
+  transform:translateY(-2px);
+}
+.fighter-pro.enemy.active{border-color:#b65b54;box-shadow:0 0 0 2px rgba(182,91,84,.10)}
+.fighter-pro.attack-l{animation:proAttackL .38s ease}
+.fighter-pro.attack-r{animation:proAttackR .38s ease}
+.fighter-pro.take-hit{animation:proHit .3s ease}
+@keyframes proAttackL{0%,100%{transform:translateX(0)}45%{transform:translateX(12px) scale(1.035)}}
+@keyframes proAttackR{0%,100%{transform:translateX(0)}45%{transform:translateX(-12px) scale(1.035)}}
+@keyframes proHit{0%,100%{transform:translateX(0)}30%{transform:translateX(5px);filter:brightness(1.7)}}
+.pro-avatar{
+  width:68px;height:68px;margin:0 auto 7px;border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:31px;background:linear-gradient(145deg,#2a3038,#181b20);
+  border:1px solid #3a4048;
+}
+.pro-name{font-size:12px;font-weight:900;margin-bottom:2px}
+.pro-level{font-size:9.5px;color:var(--text-dim);margin-bottom:7px}
+.pro-hp{
+  height:9px;background:#0d0f12;border:1px solid #30353b;
+  border-radius:99px;overflow:hidden;
+}
+.pro-hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#4fa8a0,#74c4ba);transition:width .28s ease}
+.enemy .pro-hp i{background:linear-gradient(90deg,#b84e48,#e47a70)}
+.pro-hp-label{display:flex;justify-content:space-between;font-size:9px;color:var(--text-dim);margin-top:4px}
+.pro-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;
+}
+.pro-stat{
+  font-size:9px;color:var(--text-dim);background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.055);border-radius:7px;padding:4px 2px;
+}
+.pro-gear{
+  display:flex;justify-content:center;gap:4px;margin-top:7px;
+}
+.pro-gear span{
+  width:24px;height:24px;border-radius:7px;background:#22272e;
+  border:1px solid #343a43;display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.pro-gear span.empty{opacity:.28}
+.pro-vs{
+  width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:#20252b;border:1px solid #3a4048;color:var(--accent-strong);
+  font-size:11px;font-weight:900;box-shadow:0 7px 20px rgba(0,0,0,.3);
+}
+.combat-message{
+  min-height:36px;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:7px 10px;margin:8px 0;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  font-size:11.5px;color:var(--text-dim);
+}
+.action-panel{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px;
+}
+.combat-action{
+  min-height:58px;border:1px solid var(--border);border-radius:13px;
+  background:var(--surface);color:var(--text);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-family:inherit;font-weight:800;transition:.16s ease;
+}
+.combat-action:active{transform:scale(.97)}
+.combat-action:hover{border-color:#4a515b;background:var(--surface-2)}
+.combat-action strong{font-size:12px}
+.combat-action small{font-size:9.5px;color:var(--text-dim)}
+.combat-action.primary{border-color:rgba(217,164,65,.45);background:linear-gradient(145deg,rgba(217,164,65,.13),var(--surface))}
+.combat-action.skill{border-color:rgba(79,168,160,.4)}
+.combat-action:disabled{opacity:.42;cursor:not-allowed}
+.stamina-pro{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:9px 11px;margin-bottom:9px;
+}
+.stamina-pro-head{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-dim);margin-bottom:6px}
+.stamina-pro-head b{color:var(--text)}
+.stamina-pro-track{height:7px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.stamina-pro-track i{display:block;height:100%;background:linear-gradient(90deg,#4c8fc4,#72b8e8);transition:width .2s ease}
+.combat-log{
+  background:#0f1114;border:1px solid var(--border);border-radius:13px;
+  padding:8px 10px;max-height:116px;overflow:auto;margin-bottom:9px;
+}
+.combat-log p{margin:0;padding:5px 0;border-bottom:1px dashed #292e34;font-size:10.5px;line-height:1.4;color:var(--text-dim)}
+.combat-log p:last-child{border-bottom:none}
+.combat-footer{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+
   /* ---------- Toast ---------- */
   .toast{
     position:fixed;
@@ -748,137 +872,178 @@ function cabin(c){let h='<div class="cabin"><div class="seats">';for(let i=0;i<1
 function cityView(){let h=s.city==='cairo'?'<div class="cityHero"><h2>القاهرة</h2><p>الأهرامات وأبو الهول</p><div class="pyramid"></div><div class="pyramid small"></div><div class="sphinx">🗿</div></div>':'<div class="cityHero" style="background:linear-gradient(#294d67,#111a23)"><h2>المدينة الرئيسية</h2><p>مركز انطلاق العصابة</p><div class="sphinx">🏙️</div></div>';let a=[['🏢','المركز الرئيسي',''],['⚔️','حلبة القتال','data-vopen=missions'],['🛒','مركز التسوق','data-vopen=market'],['🔒','السجن',''],['🏥','المستشفى','data-vopen=hospital']];if(s.city==='main')a=a.slice(0,3).concat([['✈️','المطار','data-vopen=airport']]);h+='<div class="places">'+a.map(x=>'<button class="place" '+x[2]+'><div class="placeArt">'+x[0]+'</div><div class="placeBody"><b>'+x[1]+'</b><small>'+({'🏢':'إدارة ومتابعة العصابة','⚔️':'المهمات والمواجهات','🛒':'معدات وأسعار المدن','🔒':'الأحداث الخاصة بالسجن','🏥':'راحة بعد الخسارة','✈️':'السفر بين المدن'}[x[0]]||'')+'</small></div></button>').join('')+'</div>';open('مدينة '+city()[1],h)}
 function hospital(){if(s.city!=='cairo')return open('المستشفى','<div class="notice">المستشفى متاح في القاهرة فقط.</div>');if(!s.hospital)return open('المستشفى','<div class="notice">لا تحتاج إلى راحة الآن. بعد خسارة حلبة القتال قد تحتاج 3 إلى 5 دقائق حسب حالتك.</div>');let r=Math.max(0,s.hospital-Date.now());if(!r){s.hospital=null;save();return hospital()}open('المستشفى','<div class="card"><h3>🏥 الراحة</h3><div class="timer">المتبقي: '+Math.ceil(r/60000)+' دقيقة</div><p class="sub">يمكنك الانتظار حتى انتهاء فترة الراحة ثم العودة إلى الحلبة.</p></div>')}
 
-/* ===== شاشة القتال التفاعلية ===== */
+/* ===== شاشة القتال الاحترافية ===== */
 function battle(l){
   if(s.energy<1)return toast('لا توجد طاقة كافية');
   s.energy--;s.last=Date.now();save();
 
-  const ep=E(l),eDef=Math.round(ep*.55),eSpd=Math.round(ep*.4),eAcc=Math.round(ep*.35);
-  const pp=B(s.level)+s.stats.power,pDef=10+s.stats.defense,pSpd=s.stats.speed,pAcc=8+s.stats.accuracy;
-  let ph=100,eh=100,stamina=100,guardPlayer=false,auto=false,over=false;
+  const enemyPower=E(l);
+  const enemy={power:enemyPower,defense:Math.round(enemyPower*.55),speed:Math.round(enemyPower*.4),accuracy:Math.round(enemyPower*.35)};
+  const player={power:B(s.level)+s.stats.power,defense:10+s.stats.defense,speed:s.stats.speed,accuracy:8+s.stats.accuracy};
+  let ph=100,eh=100,stamina=100,guard=false,over=false,round=1,turn='player',busy=false;
 
-  const slots=['kit','shield','boots','helmet'];
-  const slotIcon={kit:'🔫',shield:'🛡️',boots:'🥾',helmet:'🪖'};
-  const slotLabel={kit:'السلاح',shield:'الدرع',boots:'الحذاء',helmet:'الخوذة'};
+  const gear=[
+    ['kit','🔫'],['shield','🛡️'],['boots','🥾'],['helmet','🪖']
+  ];
 
-  function gearRow(owned){
-    return '<div class="battleGear">'+slots.map(k=>
-      '<div class="gearSlot'+(owned&&!s.gear[k]?' empty':'')+'"><span>'+slotIcon[k]+'</span><small>'+slotLabel[k]+'</small></div>'
-    ).join('')+'</div>';
-  }
+  const clamp=n=>Math.max(0,Math.min(100,n));
+  const q=id=>Q(id);
 
-  function panel(isEnemy){
-    const name=isEnemy?'الخصم':'المستخدم',lvl=isEnemy?l:s.level,hp=isEnemy?eh:ph;
-    const st=isEnemy?{power:ep,defense:eDef,speed:eSpd,accuracy:eAcc}:{power:Math.round(pp),defense:pDef,speed:pSpd,accuracy:pAcc};
-    return '<div class="side'+(isEnemy?' enemy':'')+'">'
-      +'<div class="portrait">'+(isEnemy?'🥷':'👤')+'</div>'
-      +'<b>'+name+'</b><small>المستوى '+lvl+'</small>'
-      +'<div class="hp"><i id="'+(isEnemy?'ehp':'php')+'" style="width:'+hp+'%"></i></div>'
-      +'<div class="statsMini">'
-        +'<span>💪 القوة: '+st.power+'</span>'
-        +'<span>🛡️ الدفاع: '+st.defense+'</span>'
-        +'<span>⚡ السرعة: '+st.speed+'</span>'
-        +'<span>🎯 الدقة: '+st.accuracy+'</span>'
+  function fighter(isEnemy){
+    const x=isEnemy?enemy:player;
+    const hp=isEnemy?eh:ph;
+    return '<div class="fighter-pro '+(isEnemy?'enemy':'')+'" id="'+(isEnemy?'enemyF':'playerF')+'">'
+      +'<div class="pro-avatar">'+(isEnemy?'🥷':'👤')+'</div>'
+      +'<div class="pro-name">'+(isEnemy?'الخصم':'مقاتلك')+'</div>'
+      +'<div class="pro-level">المستوى '+(isEnemy?l:s.level)+'</div>'
+      +'<div class="pro-hp"><i id="'+(isEnemy?'ehp':'php')+'" style="width:'+hp+'%"></i></div>'
+      +'<div class="pro-hp-label"><span>الصحة</span><b id="'+(isEnemy?'ehpv':'phpv')+'">'+Math.round(hp)+'/100</b></div>'
+      +'<div class="pro-stats">'
+      +'<span class="pro-stat">💪 '+x.power+'</span><span class="pro-stat">🛡️ '+x.defense+'</span>'
+      +'<span class="pro-stat">⚡ '+x.speed+'</span><span class="pro-stat">🎯 '+x.accuracy+'</span>'
       +'</div>'
-      +gearRow(!isEnemy)
+      +(isEnemy?'':'<div class="pro-gear">'+gear.map(g=>'<span class="'+(s.gear[g[0]]?'':'empty')+'">'+g[1]+'</span>').join('')+'</div>')
       +'</div>';
   }
 
   function render(){
-    open('مهمة قتال • مستوى المهمة: '+l,
-      '<div class="battle">'
-        +'<div class="battleHead">'+panel(false)+'<div class="vs">VS</div>'+panel(true)+'</div>'
-        +'<div class="turn" id="bt">دورك الآن</div>'
-        +'<div class="log" id="bl"></div>'
-        +'<div class="battleActions">'
-          +'<button class="btn" id="atk">⚔️ هجوم</button>'
-          +'<button class="btn" id="def">🛡️ دفاع</button>'
-        +'</div>'
-        +'<div class="staminaRow"><span>⚡ نقاط التحمل</span><b id="stv">'+stamina+' / 100</b></div>'
-        +'<div class="hp"><i id="stf" style="width:'+stamina+'%"></i></div>'
-        +'<button class="btn btn-block" id="autoBtn">الهجوم التلقائي</button>'        +'<div class="battleFooter">'
-          +'<button class="btn btn-ghost" id="retreat">🏃 الانسحاب</button>'
-          +'<button class="btn btn-ghost" id="exit">🚪 خروج</button>'
-        +'</div>'
+    open('المواجهة • مهمة المستوى '+l,
+      '<div class="battle-pro">'
+      +'<div class="battle-topbar"><span class="battle-round" id="round">الجولة 1</span><div class="battle-turn" id="turn">دورك الآن</div><span class="battle-round">⚡ '+s.energy+'</span></div>'
+      +'<div class="combat-card"><div class="combatants-pro">'+fighter(false)+'<div class="pro-vs">VS</div>'+fighter(true)+'</div></div>'
+      +'<div class="combat-message" id="message">اختر حركتك لبدء الجولة.</div>'
+      +'<div class="action-panel">'
+      +'<button class="combat-action primary" id="atk"><strong>⚔️ هجوم</strong><small>تحمل 15 • ضرر أساسي</small></button>'
+      +'<button class="combat-action" id="def"><strong>🛡️ دفاع</strong><small>تحمل 8 • تقليل الضرر</small></button>'
+      +'<button class="combat-action skill" id="skill"><strong>💥 ضربة قوية</strong><small>تحمل 25 • ضرر أعلى</small></button>'
+      +'<button class="combat-action" id="autoBtn"><strong>🤖 تلقائي</strong><small>تبديل القتال التلقائي</small></button>'
+      +'</div>'
+      +'<div class="stamina-pro"><div class="stamina-pro-head"><span>نقاط التحمل</span><b id="stv">100 / 100</b></div><div class="stamina-pro-track"><i id="stf" style="width:100%"></i></div></div>'
+      +'<div class="combat-log" id="bl"><p>المواجهة بدأت. أنت صاحب الدور الأول.</p></div>'
+      +'<div class="combat-footer"><button class="btn btn-ghost" id="retreat">🏃 انسحاب</button><button class="btn btn-ghost" id="exit">🚪 خروج</button></div>'
       +'</div>');
+    syncTurn();
     bind();
   }
 
-  function log(msg){let el=Q('bl');if(!el)return;let p=document.createElement('p');p.innerHTML=msg;el.prepend(p)}
+  function log(msg){
+    const el=q('bl');if(!el)return;
+    const p=document.createElement('p');p.innerHTML=msg;el.prepend(p);
+  }
 
-  function updateBars(){
-    if(Q('php'))Q('php').style.width=Math.max(0,ph)+'%';
-    if(Q('ehp'))Q('ehp').style.width=Math.max(0,eh)+'%';
-    if(Q('stv'))Q('stv').textContent=Math.max(0,stamina)+' / 100';
-    if(Q('stf'))Q('stf').style.width=Math.max(0,stamina)+'%';
+  function message(msg){if(q('message'))q('message').textContent=msg}
+
+  function syncTurn(){
+    if(q('turn'))q('turn').textContent=turn==='player'?'دورك الآن':'دور الخصم';
+    if(q('round'))q('round').textContent='الجولة '+round;
+    const pf=q('playerF'),ef=q('enemyF');
+    if(pf)pf.classList.toggle('active',turn==='player');
+    if(ef)ef.classList.toggle('active',turn==='enemy');
+  }
+
+  function update(){
+    const php=q('php'),ehp=q('ehp');
+    if(php)php.style.width=clamp(ph)+'%';
+    if(ehp)ehp.style.width=clamp(eh)+'%';
+    if(q('phpv'))q('phpv').textContent=Math.round(ph)+'/100';
+    if(q('ehpv'))q('ehpv').textContent=Math.round(eh)+'/100';
+    if(q('stv'))q('stv').textContent=stamina+' / 100';
+    if(q('stf'))q('stf').style.width=stamina+'%';
+    ['atk','def','skill'].forEach(id=>{const b=q(id);if(b)b.disabled=over||busy||turn!=='player'});
+  }
+
+  function animate(attacker,defender){
+    const a=q(attacker),d=q(defender);
+    if(a){a.classList.remove('attack-l','attack-r');void a.offsetWidth;a.classList.add(attacker==='playerF'?'attack-l':'attack-r')}
+    if(d){d.classList.remove('take-hit');void d.offsetWidth;d.classList.add('take-hit')}
   }
 
   function end(win){
-    over=true;
+    over=true;busy=false;update();
     if(win){
-      let xp=N(l),money=900+l*350;
+      const xp=N(l),money=900+l*350;
       s.cash+=money;s.done=Math.min(50,s.done+1);s.xp+=xp;
       let up=0;
       while(s.xp>=N(s.level)&&s.level<50){s.xp-=N(s.level);s.level++;s.free+=10;s.energy=s.max;up++}
       save();
-      open('نتيجة المعركة','<div class="result-card"><b>🏆 فزت بالمهمة</b><p>💵 +'+money+' • ✨ XP +'+xp+'</p>'+(up?'<p>🎉 ارتقيت إلى المستوى '+s.level+' وحصلت على 10 نقاط حرة.</p>':'')+'</div>');
+      open('نتيجة المواجهة','<div class="result-card"><div class="result-icon">🏆</div><div><b>انتصار مستحق</b><small>تم إسقاط الخصم في الجولة '+round+'.</small></div></div><ul class="reward-list"><li>💵 +'+money.toLocaleString()+' مال</li><li>✨ +'+xp+' XP</li>'+(up?'<li class="level-up">🎉 ارتقيت إلى المستوى '+s.level+' وحصلت على 10 نقاط حرة</li>':'')+'</ul><button class="btn btn-block" id="backAfter">متابعة</button>');
+      q('backAfter')?.addEventListener('click',missions);
     }else{
       s.hospital=s.city==='cairo'?Date.now()+(ph<35?300000:ph<70?240000:180000):null;
       save();
-      open('نتيجة المعركة','<div class="result-card"><b>❌ خسرت</b><p>لم تحصل على مكافأة. إذا كنت في القاهرة ستجد فترة الراحة في المستشفى: 3–5 دقائق حسب الحالة.</p></div>');
+      open('نتيجة المواجهة','<div class="result-card"><div class="result-icon" style="background:rgba(193,68,60,.15);color:#e47a70">×</div><div><b>انتهت المواجهة</b><small>لم تحصل على مكافأة. خسارتك تؤثر على التعافي فقط.</small></div></div>'+(s.city==='cairo'?'<div class="notice">🏥 فترة الراحة في القاهرة: 3–5 دقائق حسب حالتك.</div>':'')+'<button class="btn btn-block" id="backAfter">العودة</button>');
+      q('backAfter')?.addEventListener('click',missions);
     }
   }
 
-  function playerTurn(action){
-    if(over)return;
-    const cost=action==='atk'?15:8;
+  function playerAction(type){
+    if(over||busy||turn!=='player')return;
+    const cost=type==='atk'?15:type==='def'?8:25;
     if(stamina<cost)return toast('نقاط التحمل غير كافية');
-    stamina=Math.max(0,stamina-cost);
-    guardPlayer=action==='def';
-    if(action==='atk'){
-      let dmg=Math.max(1,Math.round(pp*(.7+Math.random()*.3)-eDef*.3));
-      eh=Math.max(0,eh-dmg);
-      log('⚔️ لقد هاجمت الخصم وسببت '+dmg+' نقطة ضرر.');
+    busy=true;stamina-=cost;guard=type==='def';
+    let dmg=0;
+    if(type==='atk'){
+      dmg=Math.max(1,Math.round(player.power*(.72+Math.random()*.28)-enemy.defense*.28));
+      eh=clamp(eh-dmg);
+      animate('playerF','enemyF');message('هجوم ناجح • '+dmg+' ضرر');
+      log('⚔️ هجومك أصاب الخصم وسبب <b>'+dmg+'</b> ضرر.');
+    }else if(type==='def'){
+      message('🛡️ دفاعك ارتفع لهذه الضربة.');
+      log('🛡️ دخلت وضع الدفاع، الضرر القادم أقل.');
     }else{
-      log('🛡️ اتخذت وضع الدفاع، سيقل الضرر القادم.');
+      const hitChance=Math.min(.95,.62+player.accuracy*.006);
+      if(Math.random()<=hitChance){
+        dmg=Math.max(2,Math.round(player.power*(1.05+Math.random()*.45)-enemy.defense*.22));
+        eh=clamp(eh-dmg);
+        animate('playerF','enemyF');message('💥 ضربة قوية • '+dmg+' ضرر');
+        log('💥 الضربة القوية أصابت الخصم وسببت <b>'+dmg+'</b> ضرر.');
+      }else{
+        message('الضربة القوية أخطأت.');
+        log('❌ أخطأت الضربة القوية.');
+      }
     }
-    updateBars();
-    if(eh<=0)return end(true);
-    if(stamina<=0){
-      log('😮‍💨 نفدت نقاط تحملك.');
-      return end(false);
-    }
-    if(Q('bt'))Q('bt').textContent='دور الخصم';
-    setTimeout(enemyTurn,600);
+    update();
+    if(eh<=0)return setTimeout(()=>end(true),420);
+    turn='enemy';syncTurn();
+    setTimeout(enemyAction,650);
   }
 
-  function enemyTurn(){
+  function enemyAction(){
     if(over)return;
-    if(Math.random()<.18){
-      log('🛡️ الخصم اتخذ وضع الدفاع.');
+    let dmg=0;
+    if(Math.random()<.17){
+      message('الخصم اتخذ وضع الدفاع.');
+      log('🛡️ الخصم دافع عن نفسه.');
     }else{
-      let dmg=Math.max(1,Math.round(ep*(.5+Math.random()*.25)-pDef*(.3+(guardPlayer?.35:0))));
-      ph=Math.max(0,ph-dmg);
-      log('👊 هاجمك الخصم وسبب لك '+dmg+' نقطة ضرر.');
+      const hitChance=Math.min(.93,.62+enemy.accuracy*.006);
+      if(Math.random()<=hitChance){
+        dmg=Math.max(1,Math.round(enemy.power*(.55+Math.random()*.25)-player.defense*(guard?.55:.3)));
+        ph=clamp(ph-dmg);animate('enemyF','playerF');
+        message('الخصم هاجمك • '+dmg+' ضرر');
+        log('👊 الخصم هاجمك وسبب <b>'+dmg+'</b> ضرر.');
+      }else{
+        message('الخصم أخطأ هجومه.');
+        log('↔️ الخصم أخطأ، ولم تتلقَّ ضرراً.');
+      }
     }
-    guardPlayer=false;
-    updateBars();
+    guard=false;round++;busy=false;
     if(ph<=0)return end(false);
-    if(Q('bt'))Q('bt').textContent='دورك الآن';
-    if(auto&&!over&&stamina>=15)setTimeout(()=>playerTurn('atk'),500);
+    turn='player';syncTurn();update();
+    if(auto&&!over)setTimeout(()=>playerAction('atk'),450);
   }
 
+  let auto=false;
   function bind(){
-    let a=Q('atk'),d=Q('def'),ab=Q('autoBtn'),r=Q('retreat'),ex=Q('exit');
-    if(a)a.onclick=()=>playerTurn('atk');
-    if(d)d.onclick=()=>playerTurn('def');
-    if(ab)ab.onclick=()=>{
+    q('atk')?.addEventListener('click',()=>playerAction('atk'));
+    q('def')?.addEventListener('click',()=>playerAction('def'));
+    q('skill')?.addEventListener('click',()=>playerAction('skill'));
+    q('autoBtn')?.addEventListener('click',()=>{
       auto=!auto;
-      ab.textContent=auto?'إيقاف الهجوم التلقائي':'الهجوم التلقائي';
-      if(auto&&!over)playerTurn('atk');
-    };
-    if(r)r.onclick=()=>{if(!over)end(false)};
-    if(ex)ex.onclick=()=>{let o=Q('screen')||document.querySelector('.sheet-overlay');if(o)o.classList.remove('open')};
+      const b=q('autoBtn');if(b)b.innerHTML='<strong>🤖 '+(auto?'إيقاف التلقائي':'تلقائي')+'</strong><small>تبديل القتال التلقائي</small>';
+      if(auto&&!over&&turn==='player')playerAction('atk');
+    });
+    q('retreat')?.addEventListener('click',()=>{if(!over)end(false)});
+    q('exit')?.addEventListener('click',()=>{const o=Q('screen')||document.querySelector('.sheet-overlay');if(o)o.classList.remove('open')});
   }
 
   render();
@@ -888,7 +1053,7 @@ window.SG2={missions,training,market,airport,cabin,cityView,hospital,battle,save
 
 </script>
 <script>
-(()=>{'use strict';const G=window.SG2;if(!G)return;const S=G.state,$=id=>document.getElementById(id),O=$('screen'),T=$('sheetTitle'),C=$('content'),IMG='assets/mission-battle.b64';let regenId,travelId;
+(()=>{'use strict';const G=window.SG2;if(!G)return;const S=G.state,$=id=>document.getElementById(id),O=$('screen'),T=$('sheetTitle'),C=$('content');let regenId,travelId;
 const money=n=>Number(n||0).toLocaleString('ar-EG'),name=id=>({main:'المدينة الرئيسية',cairo:'القاهرة',alex:'الإسكندرية',dubai:'دبي',istanbul:'إسطنبول'})[id]||id;
 function sync(){const c=G.city();$('cash').textContent=money(S.cash);$('levelBadge').textContent=S.level;$('cityName').textContent=c[1];$('energyLabel').textContent=S.energy+'/'+S.max;$('energyFill').style.width=Math.min(100,S.energy/S.max*100)+'%';$('done').textContent=S.done;$('respect').textContent=S.done*10}
 function open(t,h){T.textContent=t;C.innerHTML=h;O.classList.add('open');sync()}function close(){O.classList.remove('open')}function toast(m,g){const e=$('toast');e.textContent=m;e.className='toast show '+(g?'toast-good':'toast-warn');clearTimeout(e._t);e._t=setTimeout(()=>e.className='toast',2200)}
@@ -899,7 +1064,7 @@ function airport(){let h='<div class="airportHero"><b>✈️ مطار المدي
 function cabin(){let h='<div class="cabin"><div class="cabinTop">✈️ داخل الطائرة</div><div class="seats">';for(let i=1;i<=16;i++)h+='<div class="seat">👤<small>مقعد '+i+'</small></div>';h+='</div></div>';if(S.travel){const r=Math.max(0,S.travel.arrive-Date.now());h+='<div class="card"><b>متجه إلى '+name(S.travel.city)+'</b><small>الوصول بعد '+Math.ceil(r/60000)+' دقيقة</small><div class="flightProgress"><i style="width:'+Math.max(0,100-r/(S.travel.duration*60000)*100)+'%"></i></div></div>'}open('الطائرة من الداخل',h)}
 function city(){const ca=S.city==='cairo';let h=ca?'<div class="cityHero cairoHero"><h2>القاهرة</h2><p>الأهرامات وأبو الهول</p><div class="pyramid"></div><div class="pyramid small"></div><div class="sphinx">🗿</div></div>':'<div class="cityHero mainHero"><h2>المدينة الرئيسية</h2><p>مركز العصابة</p><div class="citySilhouette">🏙️</div></div>';const p=ca?[['🏢','المركز الرئيسي',''],['⚔️','حلبة القتال','m'],['🛒','مركز التسوق','s'],['🔒','السجن','p'],['🏥','المستشفى','h']]:[['🏢','المركز الرئيسي',''],['⚔️','حلبة القتال','m'],['🛒','مركز التسوق','s'],['✈️','المطار','a']];h+='<div class="places">'+p.map(x=>'<button class="place" data-place="'+x[2]+'"><div class="placeArt">'+x[0]+'</div><div class="placeBody"><b>'+x[1]+'</b><small>اضغط للدخول</small></div></button>').join('')+'</div>';open('مدينة '+G.city()[1],h)}
 function hospital(){if(S.city!=='cairo')return open('المستشفى','<div class="notice">المستشفى متاح في القاهرة فقط.</div>');const r=S.hospital?Math.max(0,S.hospital-Date.now()):0;if(!r)return open('المستشفى','<div class="notice">لا توجد فترة راحة حالياً.</div>');let h='<div class="card"><h3>🏥 الراحة</h3><div class="timer">'+Math.ceil(r/60000)+' دقيقة متبقية</div>';if(S.medicine>0)h+='<button class="btn btn-block" data-meduse>💊 استخدام دواء وتسريع التعافي</button>';open('المستشفى',h+'</div>')}
-function trade(){open('التجارة','<div class="notice">نظام التجارة مرتبط بالمدينة الحالية. اشترِ معدات المدينة الرئيسية ثم بعها في القاهرة بسعر أعلى عندما تكون مناسبة.</div><div class="stat-grid"><div class="stat-box"><b>المدينة</b><span>'+G.city()[1]+'</span></div><div class="stat-box"><b>معداتك</b><span>'+Object.values(S.gear).reduce((a,b)=>a+b,0)+'</span></div></div><button class="btn btn-block" data-open-market>فتح السوق</button>')}function battle(l){G.battle(l);setTimeout(()=>{const host=C.querySelector('.battle');if(!host)return;const w=document.createElement('div');w.className='mission-image-wrap';w.innerHTML='<img class="missionBattleImage" alt="صورة القتال">';host.prepend(w);fetch(IMG).then(r=>r.text()).then(b=>{w.querySelector('img').src='data:image/jpeg;base64,'+b.trim()}).catch(()=>w.remove())},40)}
+function trade(){open('التجارة','<div class="notice">نظام التجارة مرتبط بالمدينة الحالية. اشترِ معدات المدينة الرئيسية ثم بعها في القاهرة بسعر أعلى عندما تكون مناسبة.</div><div class="stat-grid"><div class="stat-box"><b>المدينة</b><span>'+G.city()[1]+'</span></div><div class="stat-box"><b>معداتك</b><span>'+Object.values(S.gear).reduce((a,b)=>a+b,0)+'</span></div></div><button class="btn btn-block" data-open-market>فتح السوق</button>')}function battle(l){G.battle(l)}
 function flight(d){const v={cairo:[1300,14],alex:[1700,18],dubai:[3500,45],istanbul:[5200,70]}[d];if(!v)return;if(S.travel)return toast('لديك رحلة بالفعل');if(S.cash<v[0])return toast('الرصيد غير كافٍ');S.cash-=v[0];S.travel={city:d,from:S.city,arrive:Date.now()+v[1]*60000,duration:v[1]};G.save();sync();cabin();clearInterval(travelId);travelId=setInterval(check,10000)}
 function check(){if(S.travel&&Date.now()>=S.travel.arrive){S.city=S.travel.city;S.travel=null;G.save();sync();clearInterval(travelId);toast('وصلت إلى '+G.city()[1],true);city()}}
 function regen(){const n=Date.now(),g=Math.floor((n-(S.last||n))/180000);if(g>0){S.energy=Math.min(S.max,S.energy+g);S.last=n;G.save();sync()}}
