@@ -926,7 +926,7 @@ function battle(l,kind){
       +'<div class="pro-avatar">'+(isEnemy?'🥷':'👤')+'</div>'
       +'<div class="pro-name">'+(isEnemy?'الخصم':'مقاتلك')+'</div>'
       +'<div class="pro-level">المستوى '+(isEnemy?l:s.level)+'</div>'
-      +'<div class="pro-hp"><i id="'+(isEnemy?'ehp':'php')+'" style="width:'+Math.round(hp/maxHp*100)+'%"></i></div>'
+      +'<div class="pro-hp"><i id="'+(isEnemy?'ehp':'php')+'" style="width:'+Math.round(hp/(isEnemy?enemyMaxHp:playerMaxHp)*100)+'%"></i></div>'
       +'<div class="pro-hp-label"><span>الصحة</span><b id="'+(isEnemy?'ehpv':'phpv')+'">'+Math.round(hp)+'/'+maxHp+'</b></div>'
       +'<div class="pro-stats">'
       +'<span class="pro-stat">💪 '+x.power+'</span><span class="pro-stat">🛡️ '+x.defense+'</span>'
@@ -1034,10 +1034,10 @@ function battle(l,kind){
     guard=false;round++;busy=false;
     if(ph<=0)return end(false);
     turn='player';syncTurn();update();
-    if(auto&&!over)setTimeout(()=>playerAction('atk'),450);
+    if(!over)setTimeout(()=>playerAction(),450);
   }
 
-  let auto=false;
+  let auto=true;
   function bind(){
     q('retreat')?.addEventListener('click',()=>{if(!over)end(false)});
     q('exit')?.addEventListener('click',()=>{const o=Q('screen')||document.querySelector('.sheet-overlay');if(o)o.classList.remove('open')});
