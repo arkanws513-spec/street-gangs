@@ -1,3 +1,4 @@
+import * as Phaser from "https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.esm.js";
 export class Building extends Phaser.GameObjects.Container{
  constructor(scene,data,onOpen){
   super(scene,data.x,data.y);
