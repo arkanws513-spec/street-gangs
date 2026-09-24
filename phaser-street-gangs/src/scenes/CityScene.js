@@ -1,3 +1,4 @@
+import * as Phaser from "https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.esm.js";
 import {WORLD,LOCATIONS} from "../config/world.js";import {PlayerSystem} from "../systems/PlayerSystem.js";import {Player} from "../entities/Player.js";import {Building} from "../entities/Building.js";import {createHud} from "../ui/Hud.js";
 export class CityScene extends Phaser.Scene{
  constructor(){super("CityScene")}
