@@ -572,6 +572,7 @@
 
 
 /* ===== Professional battle redesign ===== */
+.auto-battle-panel{display:flex;align-items:center;gap:10px;background:linear-gradient(145deg,rgba(217,164,65,.12),var(--surface));border:1px solid rgba(217,164,65,.3);border-radius:14px;padding:11px 12px;margin-bottom:9px}.auto-battle-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(217,164,65,.12);font-size:20px}.auto-battle-panel strong{display:block;font-size:12px}.auto-battle-panel small{display:block;color:var(--text-dim);font-size:9.5px;margin-top:3px}.auto-live{margin-inline-start:auto;font-size:8px;font-weight:900;color:#68c7a9;white-space:nowrap}
 .battle-pro{
   padding-bottom:4px;
 }
@@ -912,18 +913,14 @@ function battle(l){
       +'<div class="battle-topbar"><span class="battle-round" id="round">الجولة 1</span><div class="battle-turn" id="turn">دورك الآن</div><span class="battle-round">⚡ '+s.energy+'</span></div>'
       +'<div class="combat-card"><div class="combatants-pro">'+fighter(false)+'<div class="pro-vs">VS</div>'+fighter(true)+'</div></div>'
       +'<div class="combat-message" id="message">اختر حركتك لبدء الجولة.</div>'
-      +'<div class="action-panel">'
-      +'<button class="combat-action primary" id="atk"><strong>⚔️ هجوم</strong><small>تحمل 15 • ضرر أساسي</small></button>'
-      +'<button class="combat-action" id="def"><strong>🛡️ دفاع</strong><small>تحمل 8 • تقليل الضرر</small></button>'
-      +'<button class="combat-action skill" id="skill"><strong>💥 ضربة قوية</strong><small>تحمل 25 • ضرر أعلى</small></button>'
-      +'<button class="combat-action" id="autoBtn"><strong>🤖 تلقائي</strong><small>تبديل القتال التلقائي</small></button>'
-      +'</div>'
+      +'<div class="auto-battle-panel"><div class="auto-battle-icon">⚔️</div><div><strong>المواجهة جارية تلقائيًا</strong><small>المقاتلان يتبادلان الهجمات حتى يحسم أحدهما المعركة.</small></div><span class="auto-live">● LIVE</span></div>'
       +'<div class="stamina-pro"><div class="stamina-pro-head"><span>نقاط التحمل</span><b id="stv">100 / 100</b></div><div class="stamina-pro-track"><i id="stf" style="width:100%"></i></div></div>'
       +'<div class="combat-log" id="bl"><p>المواجهة بدأت. أنت صاحب الدور الأول.</p></div>'
       +'<div class="combat-footer"><button class="btn btn-ghost" id="retreat">🏃 انسحاب</button><button class="btn btn-ghost" id="exit">🚪 خروج</button></div>'
       +'</div>');
     syncTurn();
     bind();
+    setTimeout(()=>{ if(!over) playerAction(); },700);
   }
 
   function log(msg){
@@ -949,7 +946,6 @@ function battle(l){
     if(q('ehpv'))q('ehpv').textContent=Math.round(eh)+'/100';
     if(q('stv'))q('stv').textContent=stamina+' / 100';
     if(q('stf'))q('stf').style.width=stamina+'%';
-    ['atk','def','skill'].forEach(id=>{const b=q(id);if(b)b.disabled=over||busy||turn!=='player'});
   }
 
   function animate(attacker,defender){
@@ -976,36 +972,16 @@ function battle(l){
     }
   }
 
-  function playerAction(type){
+  function playerAction(){
     if(over||busy||turn!=='player')return;
-    const cost=type==='atk'?15:type==='def'?8:25;
-    if(stamina<cost)return toast('نقاط التحمل غير كافية');
-    busy=true;stamina-=cost;guard=type==='def';
-    let dmg=0;
-    if(type==='atk'){
-      dmg=Math.max(1,Math.round(player.power*(.72+Math.random()*.28)-enemy.defense*.28));
-      eh=clamp(eh-dmg);
-      animate('playerF','enemyF');message('هجوم ناجح • '+dmg+' ضرر');
-      log('⚔️ هجومك أصاب الخصم وسبب <b>'+dmg+'</b> ضرر.');
-    }else if(type==='def'){
-      message('🛡️ دفاعك ارتفع لهذه الضربة.');
-      log('🛡️ دخلت وضع الدفاع، الضرر القادم أقل.');
-    }else{
-      const hitChance=Math.min(.95,.62+player.accuracy*.006);
-      if(Math.random()<=hitChance){
-        dmg=Math.max(2,Math.round(player.power*(1.05+Math.random()*.45)-enemy.defense*.22));
-        eh=clamp(eh-dmg);
-        animate('playerF','enemyF');message('💥 ضربة قوية • '+dmg+' ضرر');
-        log('💥 الضربة القوية أصابت الخصم وسببت <b>'+dmg+'</b> ضرر.');
-      }else{
-        message('الضربة القوية أخطأت.');
-        log('❌ أخطأت الضربة القوية.');
-      }
-    }
+    busy=true;
+    const dmg=Math.max(1,Math.round(player.power*(.72+Math.random()*.28)-enemy.defense*.28));
+    eh=clamp(eh-dmg); animate('playerF','enemyF');
+    message('هجومك • '+dmg+' ضرر');
+    log('⚔️ هاجمت الخصم وسببت <b>'+dmg+'</b> ضرر.');
     update();
     if(eh<=0)return setTimeout(()=>end(true),420);
-    turn='enemy';syncTurn();
-    setTimeout(enemyAction,650);
+    turn='enemy';syncTurn();setTimeout(enemyAction,650);
   }
 
   function enemyAction(){
@@ -1034,18 +1010,9 @@ function battle(l){
 
   let auto=false;
   function bind(){
-    q('atk')?.addEventListener('click',()=>playerAction('atk'));
-    q('def')?.addEventListener('click',()=>playerAction('def'));
-    q('skill')?.addEventListener('click',()=>playerAction('skill'));
-    q('autoBtn')?.addEventListener('click',()=>{
-      auto=!auto;
-      const b=q('autoBtn');if(b)b.innerHTML='<strong>🤖 '+(auto?'إيقاف التلقائي':'تلقائي')+'</strong><small>تبديل القتال التلقائي</small>';
-      if(auto&&!over&&turn==='player')playerAction('atk');
-    });
     q('retreat')?.addEventListener('click',()=>{if(!over)end(false)});
     q('exit')?.addEventListener('click',()=>{const o=Q('screen')||document.querySelector('.sheet-overlay');if(o)o.classList.remove('open')});
   }
-
   render();
 }
 
