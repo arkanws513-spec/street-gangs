@@ -1,0 +1,1 @@
+export class Player extends Phaser.GameObjects.Container{constructor(scene,x,y){super(scene,x,y);this.add([scene.add.circle(0,0,25,0xd9a441,0.12),scene.add.circle(0,0,18,0xd9a441)]);scene.add.existing(this);this.setDepth(30)}}
