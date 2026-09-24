@@ -1,3 +1,4 @@
+import * as Phaser from "https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.esm.js";
 import {PlayerSystem} from "../systems/PlayerSystem.js";
 export class BattleScene extends Phaser.Scene{
  constructor(){super("BattleScene")}
