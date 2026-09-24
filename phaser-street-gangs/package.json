@@ -1,0 +1,7 @@
+{
+  "name":"street-gangs-phaser",
+  "version":"0.1.0",
+  "private":true,
+  "description":"Street Gangs rebuilt with Phaser 4",
+  "scripts":{"dev":"phaser-launcher","build":"echo static-build","preview":"echo static-preview"}
+}
