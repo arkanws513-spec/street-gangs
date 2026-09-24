@@ -1,32 +1,76 @@
-// ============================================================
-// بيانات اللعبة الأساسية (Config)
-// ============================================================
-
-var BUILDINGS = {
-  hq: { key:'hq', name:'المقر الرئيسي', desc:'يحدد المستوى الأقصى لباقي المباني. ترقيته تفتح المزيد من التطور.', color:0xd4af37, baseCost:500, costGrowth:1.8, baseTime:20, timeGrowth:1.25, maxLevel:15 },
-  bank: { key:'bank', name:'المصرف', desc:'يولّد المال تلقائياً كل ثانية.', color:0x2ecc71, baseCost:200, costGrowth:1.6, baseTime:8, timeGrowth:1.3, baseIncome:2 },
-  warehouse: { key:'warehouse', name:'المستودع', desc:'يزيد السعة القصوى لتخزين المال.', color:0x3498db, baseCost:150, costGrowth:1.5, baseTime:6, timeGrowth:1.3, baseCapacity:4000 },
-  barracks: { key:'barracks', name:'الثكنة', desc:'تزيد قوة وسرعة تدريب أفراد العصابة.', color:0xe74c3c, baseCost:250, costGrowth:1.55, baseTime:10, timeGrowth:1.3, trainSpeedPerLevel:0.08 }
+var CITIES = {
+  main:{id:'main',name:'المدينة الرئيسية',emoji:'🏙️',color:0xd4af37},
+  cairo:{id:'cairo',name:'القاهرة',emoji:'🇪🇬',color:0xe67e22},
+  riyadh:{id:'riyadh',name:'الرياض',emoji:'🇸🇦',color:0x2ecc71},
+  dubai:{id:'dubai',name:'دبي',emoji:'🇦🇪',color:0x3498db},
+  paris:{id:'paris',name:'باريس',emoji:'🇫🇷',color:0x9b59b6},
+  shanghai:{id:'shanghai',name:'شنغهاي',emoji:'🇨🇳',color:0xe74c3c},
+  future1:{id:'future1',name:'وجهة قادمة',emoji:'✦',color:0x596275},
+  future2:{id:'future2',name:'وجهة قادمة',emoji:'✦',color:0x596275},
+  future3:{id:'future3',name:'وجهة قادمة',emoji:'✦',color:0x596275},
+  future4:{id:'future4',name:'وجهة قادمة',emoji:'✦',color:0x596275}
 };
 
-var CREW_TYPES = {
-  bulker: { key:'bulker', name:'رجل قوي', desc:'مقاتل بالأيدي، رخيص وسريع التدريب.', color:0x95a5a6, power:5, cost:{cash:100,manpower:1}, trainTime:5 },
-  biker: { key:'biker', name:'سائق', desc:'سريع في عمليات السطو والهروب.', color:0xf39c12, power:7, cost:{cash:150,manpower:1}, trainTime:7 },
-  shooter: { key:'shooter', name:'مسلّح', desc:'أقوى الأفراد، لكنه أغلى وأبطأ تدريباً.', color:0xc0392b, power:10, cost:{cash:220,manpower:2}, trainTime:10 }
+var CITY_DESTINATIONS = {
+  main:[
+    {id:'shop',name:'مركز التسوق',emoji:'🛍️',desc:'تجارة ومستلزمات متنوعة',kind:'shop'},
+    {id:'blackmarket',name:'السوق السوداء',emoji:'🌑',desc:'مهمات وطلبات اللاعبين',kind:'blackmarket'},
+    {id:'training',name:'مركز التدريب',emoji:'🏋️',desc:'طوّر مؤشرات شخصيتك',kind:'training'},
+    {id:'underworld',name:'العالم السفلي',emoji:'🌆',desc:'قريبًا',kind:'locked',status:'قريبًا'},
+    {id:'palace',name:'قصر مركز المدينة',emoji:'🏛️',desc:'غير متاح الآن',kind:'palace',status:'غير متاح الآن'},
+    {id:'hospital',name:'المستشفى',emoji:'🏥',desc:'حالة اللاعب بعد الهزيمة',kind:'hospital'},
+    {id:'prison',name:'السجن',emoji:'🔒',desc:'نتيجة فشل المهمة والقبض',kind:'prison'},
+    {id:'airport',name:'المطار',emoji:'✈️',desc:'السفر بين المدن',kind:'airport'}
+  ],
+  city:[
+    {id:'shop',name:'مركز التسوق',emoji:'🛍️',desc:'منتجات تختلف حسب المدينة',kind:'shop'},
+    {id:'arena',name:'الحلبة',emoji:'⚔️',desc:'خصوم أقوى بالتدريج',kind:'arena'},
+    {id:'hospital',name:'المستشفى',emoji:'🏥',desc:'حالة اللاعب بعد الهزيمة',kind:'hospital'},
+    {id:'prison',name:'السجن',emoji:'🔒',desc:'نتيجة فشل المهمة والقبض',kind:'prison'},
+    {id:'airport',name:'المطار',emoji:'✈️',desc:'السفر بين المدن',kind:'airport'},
+    {id:'palace',name:'قصر المدينة',emoji:'🏰',desc:'غير متاح الآن',kind:'palace',status:'غير متاح الآن'}
+  ]
+};
+
+var CITY_PRODUCTS = {
+  main:[
+    {name:'عدة تجارة',price:180,icon:'📦'},{name:'معدات ميدانية',price:320,icon:'🧰'},
+    {name:'ملابس مميزة',price:450,icon:'🧥'},{name:'إكسسوارات',price:260,icon:'⌚'}
+  ],
+  cairo:[
+    {name:'بضائع القاهرة',price:220,icon:'📦'},{name:'ملابس محلية',price:380,icon:'👕'},
+    {name:'أدوات سباق',price:520,icon:'🏁'},{name:'إكسسوارات نادرة',price:700,icon:'💎'}
+  ],
+  riyadh:[
+    {name:'بضائع الرياض',price:260,icon:'📦'},{name:'أزياء فاخرة',price:620,icon:'🧥'},
+    {name:'معدات سفر',price:410,icon:'🧳'},{name:'قطعة نادرة',price:900,icon:'💠'}
+  ],
+  dubai:[
+    {name:'بضائع دبي',price:300,icon:'📦'},{name:'إكسسوارات فاخرة',price:780,icon:'⌚'},
+    {name:'معدات تجارية',price:560,icon:'🧰'},{name:'مقتنى نادر',price:1200,icon:'💎'}
+  ],
+  paris:[
+    {name:'بضائع باريس',price:340,icon:'📦'},{name:'أزياء باريسية',price:680,icon:'👔'},
+    {name:'قطعة فنية',price:950,icon:'🖼️'},{name:'إكسسوار نادر',price:1100,icon:'💎'}
+  ],
+  shanghai:[
+    {name:'بضائع شنغهاي',price:280,icon:'📦'},{name:'معدات إلكترونية',price:720,icon:'📱'},
+    {name:'منتج تجاري',price:500,icon:'🧰'},{name:'قطعة محدودة',price:1300,icon:'💠'}
+  ]
 };
 
 var MISSIONS = [
-  {id:'m1',name:'سرقة متجر صغير',desc:'مهمة سهلة وسريعة لجمع بعض المال.',power:15,energy:10,time:3,reward:{cash:300,manpower:0}},
-  {id:'m2',name:'مطاردة شرطة',desc:'اهرب من الشرطة واجمع الغنائم في الطريق.',power:40,energy:20,time:6,reward:{cash:800,manpower:2}},
-  {id:'m3',name:'سطو على بنك',desc:'عملية كبيرة تحتاج عصابة قوية ومنظمة.',power:100,energy:35,time:10,reward:{cash:2500,manpower:5}},
-  {id:'m4',name:'تهريب أسلحة',desc:'صفقة خطيرة جداً لكن بمكاسب ضخمة.',power:180,energy:50,time:14,reward:{cash:5000,manpower:8}}
+  {id:'m1',name:'تسليم شحنة',type:'عامة',difficulty:'سهلة',power:20,energy:8,xp:35,reward:280},
+  {id:'m2',name:'استرداد غرض',type:'خاصة',difficulty:'متوسطة',power:45,energy:15,xp:70,reward:650},
+  {id:'m3',name:'مهمة عالية المخاطر',type:'عامة',difficulty:'صعبة',power:85,energy:25,xp:120,reward:1400},
+  {id:'m4',name:'عملية شحنة سرية',type:'خاصة',difficulty:'صعبة جدًا',power:140,energy:38,xp:190,reward:2600}
 ];
 
-var RIVAL_NAMES = ['أبو خالد','الغراب','الذئب الأسود','أبو سلطان','الكوبرا','صقر الليل','أبو راشد','الثعلب','الجرذ الرمادي','أبو ناصر'];
-
-var GAME_CONFIG = {
-  startingResources:{cash:2000,manpower:20,energy:100,maxEnergy:100},
+var ARENA_BASE=75;
+var GAME_CONFIG={
+  startingResources:{cash:2000,energy:100,maxEnergy:100,reputation:0},
+  startingProgress:{level:1,xp:0,nextXp:100,stamina:5},
+  startingStats:{strength:10,speed:10,defense:10,accuracy:10},
   energyRegenSeconds:30,
-  attackEnergyCost:15,
-  saveKey:'wakr_alawghad_save_v1'
+  saveKey:'wakr_alawghad_pro_v2'
 };
