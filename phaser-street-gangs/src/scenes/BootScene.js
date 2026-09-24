@@ -1,2 +1,0 @@
-import * as Phaser from "https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.esm.js";
-export class BootScene extends Phaser.Scene{constructor(){super("BootScene")}create(){this.scene.start("PreloadScene")}}
