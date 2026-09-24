@@ -1,0 +1,1 @@
+export const MISSIONS=Array.from({length:50},(_,i)=>{const level=i+1;return{id:level,level,type:level%3===0?"اقتحام":"مطاردة",difficulty:level<=5?"سهل":level<=15?"متوسط":level<=30?"صعب":"نخبة",enemyPower:8*Math.pow(2,level-1),reward:900+level*350,xp:10+level*4}});
