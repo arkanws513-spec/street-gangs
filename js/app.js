@@ -1,45 +1,48 @@
-const state={level:1,xp:34,next:100,money:2000,energy:86,stamina:5,reputation:12,city:"المدينة الرئيسية"};
-const places=[
-["🛒","مركز التسوق","منتجات للتجارة والمعارك","shop"],
-["🕶️","السوق السوداء","مهمات وطلبات من اللاعبين","black"],
-["🏋️","مركز التدريب","قوة • سرعة • دفاع • دقة","training"],
-["🕳️","العالم السفلي","منطقة غامضة","soon"],
-["🏛️","قصر مركز المدينة","غير متاح الآن","locked"],
-["🏥","المستشفى","علاج بعد الهزائم","hospital"],
-["⛓️","السجن","نتيجة فشل بعض المهمات","prison"],
-["✈️","المطار","السفر بين المدن","airport"],
-["👥","ملف العصابة","إدارة شخصيتك وممتلكاتك","profile"],
-["🌍","خريطة العالم","المدن والأسواق والرحلات","map"]
-];
-const products=["سيارة مستعملة","معدات حماية","هاتف نادر","ملابس فاخرة","إلكترونيات","مواد تجارية"];
+const state=JSON.parse(localStorage.getItem("sg_state")||"null")||{level:1,xp:34,next:100,money:2000,energy:86,maxEnergy:100,stamina:5,reputation:12,city:"المدينة الرئيسية",missionsDone:0,stats:{قوة:10,سرعة:10,دفاع:10,دقة:10},inventory:["سترة الحماية"]};
+const cities={
+"المدينة الرئيسية":{shop:["معدات حماية","هاتف نادر","ملابس فاخرة","إلكترونيات"],accent:"مركز نفوذك"},
+"القاهرة":{shop:["قطع غيار","إلكترونيات","ملابس محلية","مواد تجارية"],accent:"مدينة الحلبة"},
+"الرياض":{shop:["أجهزة متقدمة","قطع غيار","منسوجات","مواد تجارية"],accent:"مدينة التجارة"},
+"دبي":{shop:["إلكترونيات فاخرة","سيارات","ساعات","مواد تجارية"],accent:"مدينة الأعمال"},
+"باريس":{shop:["أزياء","إكسسوارات","إلكترونيات","مواد تجارية"],accent:"مدينة الأسواق"},
+"شنغهاي":{shop:["إلكترونيات","آلات","منسوجات","مواد تجارية"],accent:"مدينة الصناعة"}
+};
 const missions=[
-["توصيل آمن","توصيل","سهل",180,18,35],["استعادة شحنة","استرداد","متوسط",320,24,55],
-["حماية تاجر","حماية","صعب",520,32,85],["طلب خاص","خاص","خبير",800,40,120]
+["توصيل آمن","توصيل","سهل",180,18,35,42],["استعادة شحنة","استرداد","متوسط",320,24,55,58],
+["حماية تاجر","حماية","صعب",520,32,85,74],["طلب خاص","خاص","خبير",800,40,120,92]
 ];
-const $=s=>document.querySelector(s);
+const $=s=>document.querySelector(s); const save=()=>localStorage.setItem("sg_state",JSON.stringify(state));
+const esc=s=>String(s).replace(/'/g,"\\'");
 function render(){
-document.querySelector("#app").innerHTML=`<div class="game">
-<header class="top"><div class="profile"><div class="avatar">🧥</div><div><div class="name">زعيم العصابة</div><div class="sub">${state.city} • السمعة ${state.reputation}</div></div><div class="level"><b>المستوى ${state.level}</b><div class="xp"><i style="width:${state.xp/state.next*100}%"></i></div><small>${state.xp}/${state.next} XP</small></div></div>
-<div class="resources"><div class="res">💰<small>المال</small><b>${state.money}</b></div><div class="res">⚡<small>الطاقة</small><b>${state.energy}</b></div><div class="res">💪<small>التحمل</small><b>${state.stamina}</b></div><div class="res">⭐<small>السمعة</small><b>${state.reputation}</b></div></div></header>
-<section class="hero"><div class="sky"></div><div class="cityline"></div><div class="street"></div><div class="hero-title">${state.city}</div><div class="hero-sub">مركز نفوذك</div><div class="boss"><div class="head"></div><div class="body"></div><div class="tag">أنت الزعيم</div></div></section>
+const xpPct=Math.min(100,state.xp/state.next*100);
+$("#app").innerHTML=`<div class="game"><header class="top"><div class="profile"><div class="avatar">🧥</div><div><div class="name">زعيم العصابة</div><div class="sub">${state.city} • السمعة ${state.reputation}</div></div><div class="level"><b>المستوى ${state.level}</b><div class="xp"><i style="width:${xpPct}%"></i></div><small>${state.xp}/${state.next} XP</small></div></div><div class="resources"><div class="res">💰<small>المال</small><b>${state.money}</b></div><div class="res">⚡<small>الطاقة</small><b>${state.energy}/${state.maxEnergy}</b></div><div class="res">💪<small>التحمل</small><b>${state.stamina}</b></div><div class="res">⭐<small>السمعة</small><b>${state.reputation}</b></div></div></header>
+<div class="city-switch">${Object.keys(cities).map(c=>`<button class="city-chip ${c===state.city?"active":""}" onclick="travel('${esc(c)}')">${c}</button>`).join("")}</div>
+<section class="hero"><div class="sky"></div><div class="cityline"></div><div class="street"></div><div class="hero-title">${state.city}</div><div class="hero-sub">${cities[state.city].accent}</div><div class="boss"><div class="head"></div><div class="body"></div><div class="tag">أنت الزعيم</div></div></section>
 <div class="quick"><button class="q" onclick="openPanel('missions')"><strong>📋</strong>المهمات</button><button class="q" onclick="openPanel('training')"><strong>📈</strong>التطوير</button><button class="q" onclick="openPanel('shop')"><strong>🛍️</strong>المتجر</button><button class="q" onclick="openPanel('travel')"><strong>✈️</strong>السفر</button></div>
-<section class="section"><div class="section-head"><h2>مرافق المدينة</h2><span>اضغط للدخول</span></div><div class="grid">${places.map((p,i)=>`<button class="card ${p[3]==='locked'?'locked':''}" onclick="openPlace('${p[3]}','${p[1]}')"><div class="icon">${p[0]}</div><b>${p[1]}</b><small>${p[2]}</small>${p[3]==='soon'||p[3]==='locked'?'<span class="badge">غير متاح</span>':''}</button>`).join("")}</div></section>
+<section class="section"><div class="section-head"><h2>مرافق ${state.city}</h2><span>اضغط للدخول</span></div><div class="grid">${places(state.city).map(p=>`<button class="card ${p[3]==="locked"?"locked":""}" onclick="openPlace('${p[3]}','${esc(p[1])}')"><div class="icon">${p[0]}</div><b>${p[1]}</b><small>${p[2]}</small>${p[3]==="soon"||p[3]==="locked"?'<span class="badge">غير متاح</span>':""}</button>`).join("")}</div></section>
 <nav class="bottom"><button class="nav active" onclick="render()"><b>🏠</b>الرئيسية</button><button class="nav" onclick="openPanel('missions')"><b>📋</b>المهمات</button><button class="nav" onclick="openPanel('training')"><b>🏋️</b>التدريب</button><button class="nav" onclick="openPanel('shop')"><b>🛒</b>المتجر</button><button class="nav" onclick="openPanel('profile')"><b>👤</b>الملف</button></nav></div>`;
 }
-function openPlace(type,title){if(type==='shop')return openPanel('shop');if(type==='black')return openPanel('missions');if(type==='training')return openPanel('training');if(type==='airport')return openPanel('travel');if(type==='profile')return openPanel('profile');if(type==='map')return openPanel('travel');show(`${title}`,type==='hospital'?'🏥 العلاج متاح عند انخفاض الطاقة.':type==='prison'?'⛓️ لا توجد عقوبة حالية.':'🔒 هذا القسم غير متاح الآن.');}
+function places(city){return [[ "🛒","مركز التسوق","منتجات خاصة بهذه المدينة","shop"],["🕶️","السوق السوداء","مهمات وطلبات من اللاعبين","missions"],["🏋️","مركز التدريب","قوة • سرعة • دفاع • دقة","training"],["🕳️","منطقة العالم السفلي","منطقة غامضة","soon"],["🏛️","قصر "+(city==="المدينة الرئيسية"?"مركز المدينة":city),"غير متاح الآن","locked"],["🏥","المستشفى","علاج واستعادة الطاقة","hospital"],["⛓️","السجن","حالة اللاعب عند بعض الأحداث","prison"],["✈️","المطار","السفر والتجارة بين المدن","airport"],["👥","ملف العصابة","إدارة الشخصية والممتلكات","profile"],["🌍","خريطة العالم","المدن والأسواق والرحلات","map"]];}
+function openPlace(type,title){if(type==="shop")return openPanel("shop");if(type==="missions")return openPanel("missions");if(type==="training")return openPanel("training");if(type==="airport"||type==="map")return openPanel("travel");if(type==="profile")return openPanel("profile");if(type==="hospital")return openPanel("hospital");if(type==="prison")return openPanel("prison");show(title,type==="soon"?'<div class="lockbox"><div class="big">🕳️</div><b>قريبًا</b><small>سيتم فتح هذه المنطقة في تحديث لاحق.</small></div>':'<div class="lockbox"><div class="big">🔒</div><b>غير متاح الآن</b></div>');}
 function openPanel(type){
 let title="",body="";
-if(type==='shop'){title="مركز التسوق";body=`<div class="list">${products.map((x,i)=>`<div class="row"><strong>🛍️ ${x}</strong><small>متاح للتجارة أو للاستخدام داخل أنظمة اللعبة</small><button class="action" onclick="buy(${100+i*75})">شراء • ${100+i*75} 💰</button></div>`).join("")}</div>`;}
-if(type==='missions'){title="السوق السوداء • المهمات";body=`<div class="list">${missions.map((m,i)=>`<div class="row"><strong>${m[0]}</strong><small>النوع: ${m[1]} • الصعوبة: ${m[2]} • مكافأة: ${m[3]} 💰 • XP: ${m[5]} • طاقة: ${m[4]}</small><button class="action" onclick="startMission(${i})">قبول المهمة</button></div>`).join("")}</div>`;}
-if(type==='training'){title="مركز التدريب";body=`<p class="sub">التطوير يستخدم نقاط التحمل المكتسبة عند رفع المستوى.</p>${[['قوة',10],['سرعة',10],['دفاع',10],['دقة',10]].map(x=>`<div class="stat"><b>${x[0]}</b><div class="bar"><i style="width:${x[1]*5}%"></i></div><b>${x[1]}</b></div>`).join("")}<button class="action" onclick="train()">تطوير عشوائي • 1 نقطة تحمل</button>`;}
-if(type==='travel'){title="المطار";body=`<div class="list">${["القاهرة","الرياض","دبي","باريس","شنغهاي"].map(c=>`<button class="row" onclick="travel('${c}')"><strong>✈️ ${c}</strong><small>رحلة متاحة من ${state.city}</small></button>`).join("")}</div>`;}
-if(type==='profile'){title="ملف العصابة";body=`<div class="row"><strong>زعيم العصابة</strong><small>المستوى ${state.level} • المال ${state.money} • السمعة ${state.reputation}</small></div><div class="row"><strong>المعدات</strong><small>سترة الحماية • تجهيز تجميلي ظاهر في المعارك</small></div>`;}
-show(title,body);
-}
-function show(title,body){const old=document.querySelector(".modal");if(old)old.remove();document.body.insertAdjacentHTML("beforeend",`<div class="modal" onclick="if(event.target===this)this.remove()"><div class="sheet"><div class="sheet-head"><h2>${title}</h2><button class="close" onclick="this.closest('.modal').remove()">✕</button></div>${body}</div></div>`)}
-function buy(cost){if(state.money<cost)return toast("المال غير كافٍ");state.money-=cost;toast("تمت الإضافة إلى ممتلكاتك");render();}
-function train(){if(state.stamina<1)return toast("لا توجد نقاط تحمل كافية");state.stamina--;toast("تم تطوير إحدى مهاراتك");render();}
-function travel(city){state.city=city;document.querySelector(".modal")?.remove();render();toast("وصلت إلى "+city);}
-function startMission(i){const m=missions[i];if(state.energy<m[4])return toast("الطاقة غير كافية");state.energy-=m[4];setTimeout(()=>{state.money+=m[3];state.xp+=m[5];state.reputation+=2;if(state.xp>=state.next){state.xp-=state.next;state.level++;state.next+=100;state.stamina+=2;toast("ارتفع مستواك! +2 تحمل")}else toast("نجحت المهمة!");render();},700);toast("بدأت المعركة التلقائية...");}
-function toast(t){const x=document.createElement("div");x.className="toast";x.textContent=t;document.body.appendChild(x);setTimeout(()=>x.remove(),1800)}
+if(type==="shop"){title="مركز التسوق • "+state.city;body='<div class="list">'+cities[state.city].shop.map((x,i)=>'<div class="row"><strong>🛍️ '+x+'</strong><small>يمكن استخدامه أو تداوله داخل نظام المدينة</small><button class="action" onclick="buy('+(120+i*90)+')">شراء • '+(120+i*90)+' 💰</button></div>').join("")+"</div>";}
+if(type==="missions"){title="السوق السوداء • المهمات";body='<div class="row"><strong>التقدم العام</strong><small>'+state.missionsDone+' مهمة ناجحة</small><div class="progress"><i style="width:'+Math.min(100,state.missionsDone/20*100)+'%"></i></div></div><div class="list">'+missions.map((m,i)=>'<div class="row"><strong>'+m[0]+'</strong><small>النوع: '+m[1]+' • الصعوبة: '+m[2]+' • مكافأة: '+m[3]+' 💰 • XP: '+m[5]+' • طاقة: '+m[4]+'</small><button class="action" onclick="startMission('+i+')">قبول المهمة</button></div>').join("")+"</div>";}
+if(type==="training"){title="مركز التدريب";body='<p class="sub">نقاط التحمل تُكتسب عند رفع المستوى.</p>'+Object.entries(state.stats).map(([k,v])=>'<div class="stat"><b>'+k+'</b><div class="bar"><i style="width:'+Math.min(100,v*4)+'%"></i></div><b>'+v+'</b></div>').join("")+'<button class="action" onclick="train()">تطوير مهارة • 1 نقطة تحمل</button>';}
+if(type==="travel"){title="المطار • الرحلات";body='<div class="list">'+Object.keys(cities).filter(c=>c!==state.city).map(c=>'<button class="row flight" onclick="travel(\''+esc(c)+'\')"><span><b>'+state.city+'</b><small>المغادرة</small></span><strong>✈️</strong><span><b>'+c+'</b><small>رحلة متاحة</small></span></button>').join("")+"</div>";}
+if(type==="hospital"){title="المستشفى";body='<div class="row"><strong>الحالة الصحية</strong><small>الطاقة الحالية: '+state.energy+'/'+state.maxEnergy+'</small><button class="action" onclick="heal()">استعادة الطاقة • 120 💰</button></div>';}
+if(type==="prison"){title="السجن";body='<div class="lockbox"><div class="big">⛓️</div><b>لا توجد عقوبة حالية</b><small>هذا القسم يعرض حالة السجن عند تفعيل أحداث الاعتقال داخل اللعبة.</small></div>';}
+if(type==="profile"){title="ملف العصابة";body='<div class="list"><div class="row"><strong>زعيم العصابة</strong><small>المستوى '+state.level+' • '+state.city+' • سمعة '+state.reputation+'</small></div><div class="row"><strong>المعدات</strong><small>'+state.inventory.join(" • ")+'</small></div></div>';}
+show(title,body);}
+function show(title,body){document.querySelector(".modal")?.remove();document.body.insertAdjacentHTML("beforeend",'<div class="modal" onclick="if(event.target===this)this.remove()"><div class="sheet"><div class="sheet-head"><h2>'+title+'</h2><button class="close" onclick="this.closest(\'.modal\').remove()">✕</button></div>'+body+"</div></div>");}
+function buy(cost){if(state.money<cost)return toast("المال غير كافٍ");state.money-=cost;state.inventory.push("ممتلك جديد");save();toast("تم الشراء");render();}
+function train(){if(state.stamina<1)return toast("لا توجد نقاط تحمل كافية");state.stamina--;const keys=Object.keys(state.stats);const k=keys[Math.floor(Math.random()*keys.length)];state.stats[k]++;save();toast("تم تطوير "+k);render();}
+function heal(){if(state.money<120)return toast("المال غير كافٍ");state.money-=120;state.energy=state.maxEnergy;save();toast("تمت استعادة الطاقة");render();}
+function travel(city){state.city=city;save();document.querySelector(".modal")?.remove();render();toast("وصلت إلى "+city);}
+function startMission(i){const m=missions[i];if(state.energy<m[4])return toast("الطاقة غير كافية");state.energy-=m[4];save();showBattle(m);}
+function showBattle(m){
+let player=100,enemy=m[6],turn=0;show("المعركة التلقائية",'<div class="battle"><div class="versus"><div class="fighter" id="pf"><div class="portrait">🧥</div><b>أنت</b><small id="ps">100%</small><div class="hp"><i id="php" style="width:100%"></i></div></div><div class="vs">VS</div><div class="fighter" id="ef"><div class="portrait">🥷</div><b>خصم المهمة</b><small id="es">'+enemy+'%</small><div class="hp"><i id="ehp" style="width:100%"></i></div></div></div><div class="battle-log" id="blog">بدأت المواجهة… الهجوم تلقائي بالتناوب.</div></div>');
+const timer=setInterval(()=>{turn++;const mine=Math.max(8,Math.round(12+state.stats.دقة*.3));const foe=Math.max(7,Math.round(9+enemy*.12));if(turn%2){enemy=Math.max(0,enemy-mine);$("#ef")?.classList.add("hit");setTimeout(()=>$("#ef")?.classList.remove("hit"),220);$("#blog").textContent="دورك: نفذت هجمة تلقائية وأصبح الخصم "+enemy+"%";}else{player=Math.max(0,player-foe);$("#pf")?.classList.add("hit");setTimeout(()=>$("#pf")?.classList.remove("hit"),220);$("#blog").textContent="دور الخصم: رد تلقائيًا وأصبحت طاقتك "+player+"%";}if($("#php"))$("#php").style.width=player+"%";if($("#ehp"))$("#ehp").style.width=enemy+"%";if($("#ps"))$("#ps").textContent=player+"%";if($("#es"))$("#es").textContent=enemy+"%";if(enemy<=0||player<=0){clearInterval(timer);setTimeout(()=>finishBattle(enemy<=0,m),650);}},700);}
+function finishBattle(win,m){document.querySelector(".modal")?.remove();if(win){state.money+=m[3];state.xp+=m[5];state.reputation+=2;state.missionsDone++;let levelled=false;while(state.xp>=state.next){state.xp-=state.next;state.level++;state.next+=100;state.stamina+=2;levelled=true;}save();render();toast(levelled?"نجحت المهمة وارتفع مستواك!":"نجحت المهمة! +"+m[3]+"💰 +"+m[5]+"XP");}else{save();render();toast("خسرت المهمة؛ تم خصم الطاقة فقط.");}}
+function toast(t){const x=document.createElement("div");x.className="toast";x.textContent=t;document.body.appendChild(x);setTimeout(()=>x.remove(),1800);}
 render();
