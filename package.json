@@ -1,7 +1,0 @@
-{
-  "name":"street-gangs",
-  "version":"2.0.0",
-  "private":true,
-  "description":"Mobile management RPG interface for Street Gangs",
-  "scripts":{"dev":"npx serve .","preview":"npx serve .","build":"node -e \"console.log('Static build ready')\""}
-}
