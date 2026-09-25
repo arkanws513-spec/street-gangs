@@ -1,4 +1,0 @@
-class MissionsScene extends Phaser.Scene{
-  constructor(){super('MissionsScene');}
-  create(){var s=this,gs=window.gameState;header(this,'المهمات','missions');txt(s,400,135,'تقدم المهمات',17,COLORS.muted);progress(s,70,162,660,12,gs.completedMissions.length/MISSIONS.length,COLORS.green);txt(s,400,188,gs.completedMissions.length+' / '+MISSIONS.length+' مكتملة',12,COLORS.text);MISSIONS.forEach(function(m,i){var y=220+i*82;panel(s,50,y,700,70,COLORS.panel2);txt(s,70,y+17,m.name,16,COLORS.text,0);txt(s,70,y+44,m.type+' • '+m.difficulty+' • ⚡ '+m.energy,11,COLORS.muted,0);txt(s,350,y+20,'💵 '+m.reward+'   XP '+m.xp,12,COLORS.gold,0);button(s,625,y+18,100,34,'بدء المهمة',COLORS.gold,function(){var r=gs.startMission(m.id);if(r.ok){window.pendingMission=r.mission;s.scene.start('MissionBattleScene');}else{txt(s,400,570,r.reason,14,COLORS.red);}});});}
-}
