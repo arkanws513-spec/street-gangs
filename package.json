@@ -1,7 +1,7 @@
 {
   "name":"street-gangs",
-  "version":"1.0.0",
+  "version":"2.0.0",
   "private":true,
-  "description":"Arabic street gangs game built with Phaser",
+  "description":"Mobile management RPG interface for Street Gangs",
   "scripts":{"dev":"npx serve .","preview":"npx serve .","build":"node -e \"console.log('Static build ready')\""}
 }
