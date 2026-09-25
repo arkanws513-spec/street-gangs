@@ -7,6 +7,15 @@ const cities={
 "باريس":{shop:["أزياء","إكسسوارات","إلكترونيات","مواد تجارية"],accent:"مدينة الأسواق"},
 "شنغهاي":{shop:["إلكترونيات","آلات","منسوجات","مواد تجارية"],accent:"مدينة الصناعة"}
 };
+const tradeGoods={
+"المدينة الرئيسية":[["إلكترونيات",90,135],["معدات حماية",120,170],["ملابس",70,110]],
+"القاهرة":[["قطع غيار",80,125],["إلكترونيات",105,150],["مواد تجارية",60,95]],
+"الرياض":[["منسوجات",65,110],["أجهزة متقدمة",140,195],["قطع غيار",85,130]],
+"دبي":[["ساعات",150,220],["إلكترونيات فاخرة",180,260],["سيارات",300,430]],
+"باريس":[["أزياء",110,165],["إكسسوارات",75,120],["إلكترونيات",120,175]],
+"شنغهاي":[["آلات",125,185],["إلكترونيات",100,150],["منسوجات",55,90]]
+};
+const flightData={"المدينة الرئيسية":[["القاهرة",220,"09:00"],["الرياض",480,"12:30"],["دبي",620,"15:00"],["باريس",820,"18:00"],["شنغهاي",1250,"22:00"]],"القاهرة":[["الرياض",420,"08:30"],["دبي",560,"11:15"],["باريس",780,"14:20"],["شنغهاي",1150,"19:10"]],"الرياض":[["القاهرة",420,"09:10"],["دبي",300,"12:00"],["باريس",820,"15:30"],["شنغهاي",1080,"21:00"]],"دبي":[["القاهرة",560,"08:45"],["الرياض",300,"10:30"],["باريس",690,"14:10"],["شنغهاي",980,"20:15"]],"باريس":[["القاهرة",780,"09:00"],["الرياض",820,"13:40"],["دبي",690,"16:20"],["شنغهاي",1200,"22:10"]],"شنغهاي":[["القاهرة",1150,"07:50"],["الرياض",1080,"11:25"],["دبي",980,"15:00"],["باريس",1200,"20:30"]]};
 const missions=[
 ["توصيل آمن","توصيل","سهل",180,18,35,42],["استعادة شحنة","استرداد","متوسط",320,24,55,58],
 ["حماية تاجر","حماية","صعب",520,32,85,74],["طلب خاص","خاص","خبير",800,40,120,92]
@@ -26,15 +35,16 @@ function places(city){return [[ "🛒","مركز التسوق","منتجات خ�
 function openPlace(type,title){if(type==="shop")return openPanel("shop");if(type==="missions")return openPanel("missions");if(type==="training")return openPanel("training");if(type==="airport"||type==="map")return openPanel("travel");if(type==="profile")return openPanel("profile");if(type==="hospital")return openPanel("hospital");if(type==="prison")return openPanel("prison");show(title,type==="soon"?'<div class="lockbox"><div class="big">🕳️</div><b>قريبًا</b><small>سيتم فتح هذه المنطقة في تحديث لاحق.</small></div>':'<div class="lockbox"><div class="big">🔒</div><b>غير متاح الآن</b></div>');}
 function openPanel(type){
 let title="",body="";
-if(type==="shop"){title="مركز التسوق • "+state.city;body='<div class="list">'+cities[state.city].shop.map((x,i)=>'<div class="row"><strong>🛍️ '+x+'</strong><small>يمكن استخدامه أو تداوله داخل نظام المدينة</small><button class="action" onclick="buy('+(120+i*90)+')">شراء • '+(120+i*90)+' 💰</button></div>').join("")+"</div>";}
+if(type==="shop"){title="مركز التسوق • "+state.city;body='<div class="tabs"><button class="tab active">التجارة</button><span>أسعار هذه المدينة</span></div><div class="list">'+tradeGoods[state.city].map((g,i)=>'<div class="row trade-row"><div><strong>📦 '+g[0]+'</strong><small>شراء: '+g[1]+' 💰 • بيع متوقع: '+g[2]+' 💰</small></div><button class="mini" onclick="tradeBuy('+i+')">شراء</button><button class="mini sell" onclick="tradeSell('+i+')">بيع</button></div>').join("")+'</div><div class="market-note">الأسعار تختلف من مدينة لأخرى. اشترِ بسعر منخفض وبِع في مدينة تدفع أكثر.</div>';}
 if(type==="missions"){title="السوق السوداء • المهمات";body='<div class="row"><strong>التقدم العام</strong><small>'+state.missionsDone+' مهمة ناجحة</small><div class="progress"><i style="width:'+Math.min(100,state.missionsDone/20*100)+'%"></i></div></div><div class="list">'+missions.map((m,i)=>'<div class="row"><strong>'+m[0]+'</strong><small>النوع: '+m[1]+' • الصعوبة: '+m[2]+' • مكافأة: '+m[3]+' 💰 • XP: '+m[5]+' • طاقة: '+m[4]+'</small><button class="action" onclick="startMission('+i+')">قبول المهمة</button></div>').join("")+"</div>";}
 if(type==="training"){title="مركز التدريب";body='<p class="sub">نقاط التحمل تُكتسب عند رفع المستوى.</p>'+Object.entries(state.stats).map(([k,v])=>'<div class="stat"><b>'+k+'</b><div class="bar"><i style="width:'+Math.min(100,v*4)+'%"></i></div><b>'+v+'</b></div>').join("")+'<button class="action" onclick="train()">تطوير مهارة • 1 نقطة تحمل</button>';}
-if(type==="travel"){title="المطار • الرحلات";body='<div class="list">'+Object.keys(cities).filter(c=>c!==state.city).map(c=>'<button class="row flight" onclick="travel(\''+esc(c)+'\')"><span><b>'+state.city+'</b><small>المغادرة</small></span><strong>✈️</strong><span><b>'+c+'</b><small>رحلة متاحة</small></span></button>').join("")+"</div>";}
-if(type==="hospital"){title="المستشفى";body='<div class="row"><strong>الحالة الصحية</strong><small>الطاقة الحالية: '+state.energy+'/'+state.maxEnergy+'</small><button class="action" onclick="heal()">استعادة الطاقة • 120 💰</button></div>';}
-if(type==="prison"){title="السجن";body='<div class="lockbox"><div class="big">⛓️</div><b>لا توجد عقوبة حالية</b><small>هذا القسم يعرض حالة السجن عند تفعيل أحداث الاعتقال داخل اللعبة.</small></div>';}
+if(type==="travel"){title="المطار • الرحلات";const fs=flightData[state.city]||[];body='<div class="airport-head"><b>رحلات '+state.city+'</b><small>السعر والموعد قبل السفر</small></div><div class="list">'+fs.map(f=>'<button class="row flight" onclick="travelTo(\\''+esc(f[0])+'\\','+f[1]+')"><span><b>'+state.city+'</b><small>المغادرة '+f[2]+'</small></span><strong>✈️</strong><span><b>'+f[0]+'</b><small>'+f[1]+' 💰</small></span></button>').join("")+'</div>';}
 if(type==="profile"){title="ملف العصابة";body='<div class="list"><div class="row"><strong>زعيم العصابة</strong><small>المستوى '+state.level+' • '+state.city+' • سمعة '+state.reputation+'</small></div><div class="row"><strong>المعدات</strong><small>'+state.inventory.join(" • ")+'</small></div></div>';}
 show(title,body);}
 function show(title,body){document.querySelector(".modal")?.remove();document.body.insertAdjacentHTML("beforeend",'<div class="modal" onclick="if(event.target===this)this.remove()"><div class="sheet"><div class="sheet-head"><h2>'+title+'</h2><button class="close" onclick="this.closest(\'.modal\').remove()">✕</button></div>'+body+"</div></div>");}
+function tradeBuy(i){const g=tradeGoods[state.city][i];if(state.money<g[1])return toast("المال غير كافٍ");state.money-=g[1];state.inventory.push(g[0]);save();toast("تم شراء "+g[0]);render();}
+function tradeSell(i){const g=tradeGoods[state.city][i];const idx=state.inventory.indexOf(g[0]);if(idx<0)return toast("لا تملك هذه السلعة هنا");state.inventory.splice(idx,1);state.money+=g[2];save();toast("تم بيع "+g[0]+" مقابل "+g[2]+" 💰");render();}
+function travelTo(city,cost){if(state.money<cost)return toast("المال غير كافٍ للرحلة");state.money-=cost;travel(city);}
 function buy(cost){if(state.money<cost)return toast("المال غير كافٍ");state.money-=cost;state.inventory.push("ممتلك جديد");save();toast("تم الشراء");render();}
 function train(){if(state.stamina<1)return toast("لا توجد نقاط تحمل كافية");state.stamina--;const keys=Object.keys(state.stats);const k=keys[Math.floor(Math.random()*keys.length)];state.stats[k]++;save();toast("تم تطوير "+k);render();}
 function heal(){if(state.money<120)return toast("المال غير كافٍ");state.money-=120;state.energy=state.maxEnergy;save();toast("تمت استعادة الطاقة");render();}
