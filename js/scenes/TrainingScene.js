@@ -1,4 +1,0 @@
-class TrainingScene extends Phaser.Scene{
- constructor(){super('TrainingScene');}
- create(){var s=this,gs=window.gameState;header(s,'مركز التدريب','training');txt(s,400,130,'نقاط التحمل: '+gs.progress.stamina,18,COLORS.gold);var stats=[['strength','قوة','💪'],['speed','سرعة','⚡'],['defense','دفاع','🛡️'],['accuracy','دقة','🎯']];stats.forEach(function(a,i){var x=50+(i%2)*360,y=175+Math.floor(i/2)*160;panel(s,x,y,330,135,COLORS.panel2);txt(s,x+30,y+35,a[2],26);txt(s,x+75,y+26,a[1],17,COLORS.text,0);txt(s,x+75,y+56,gs.stats[a[0]]+'/100',14,COLORS.muted,0);progress(s,x+75,y+84,170,10,gs.stats[a[0]]/100,COLORS.gold);button(s,x+250,y+20,58,32,'+',COLORS.gold,function(){var r=gs.upgradeStat(a[0]);if(!r.ok)txt(s,400,530,r.reason,14,COLORS.red);s.scene.restart();});});}
-}
