@@ -1,5 +1,5 @@
-html,body{margin:0;padding:0;width:100%;height:100%;background:#0b0e14;font-family:'Cairo',Arial,sans-serif;overflow:hidden;overscroll-behavior:none}
-body{display:block}
-#game-container{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;background:#0b0e14}
-#game-container canvas{display:block;width:100%!important;height:100%!important;margin:0;padding:0;touch-action:manipulation}
-@media (max-width:700px){#game-container canvas{image-rendering:auto}}
+html,body{margin:0;padding:0;width:100%;height:100%;background:#070a10;font-family:'Cairo',Arial,sans-serif;overflow:hidden;overscroll-behavior:none}
+body{background:radial-gradient(circle at 50% 0,#182131 0,#070a10 65%)}
+#game-container{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;background:#070a10}
+#game-container canvas{display:block;width:100%!important;height:100%!important;margin:0;padding:0;touch-action:none}
+*{box-sizing:border-box}
