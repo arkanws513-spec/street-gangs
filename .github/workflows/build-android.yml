@@ -1,0 +1,46 @@
+name: Build Unity Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: unity-project/Library
+          key: UnityLibrary-Android-${{ hashFiles('unity-project/Assets/**', 'unity-project/Packages/**', 'unity-project/ProjectSettings/**') }}
+          restore-keys: |
+            UnityLibrary-Android-
+
+      - name: Build Android APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: unity-project
+          unityVersion: auto
+          targetPlatform: Android
+          buildsPath: build
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: street-gangs-android
+          path: build/Android/**/*.apk
+          if-no-files-found: error
