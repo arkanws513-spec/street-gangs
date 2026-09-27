@@ -7,12 +7,11 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  build:
+  build-webgl:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,25 +36,12 @@ jobs:
           projectPath: unity-project
           unityVersion: auto
           targetPlatform: WebGL
+          buildName: StreetGangs
           buildsPath: build
 
-      - name: Prepare Pages artifact
-        run: |
-          mkdir -p _site
-          cp -R build/WebGL/* _site/
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload WebGL Build
+        uses: actions/upload-artifact@v4
         with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          name: StreetGangs-WebGL
+          path: build/WebGL
+          if-no-files-found: error
