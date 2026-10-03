@@ -4,6 +4,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,9 +22,17 @@ jobs:
         run: curl -L https://services.gradle.org/distributions/gradle-8.7-bin.zip -o /tmp/gradle.zip && unzip -q /tmp/gradle.zip -d /tmp/gradle
       - name: Build debug APK
         run: /tmp/gradle/gradle-8.7/bin/gradle :app:assembleDebug --no-daemon
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: street-gangs-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Publish public GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: وكر الأوغاد APK v1.0.0
+          body: Android APK for وكر الأوغاد.
+          files: app/build/outputs/apk/debug/app-debug.apk
+          overwrite_files: true
