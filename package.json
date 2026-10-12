@@ -1,1 +1,21 @@
-{"name":"street-gangs","version":"0.1.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start"},"dependencies":{"next":"latest","react":"latest","react-dom":"latest"},"devDependencies":{"typescript":"latest","@types/node":"latest","@types/react":"latest","@types/react-dom":"latest"}}
+{
+  "name": "street-gangs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "15.5.27",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "22.18.12",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3"
+  }
+}
